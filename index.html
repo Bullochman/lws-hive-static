@@ -6,6 +6,7 @@
 <!-- Static GH Pages build: intercept /api/* with in-browser handlers backed by localStorage. -->
 <script src="static/fake-server.js"></script>
 <script src="static/roster-picker.js" defer></script>
+<script src="static/seasons-lib.js" defer></script>
 <script>
 // On first visit (empty state), auto-load the RONY / TINO 티노 94-member roster.
 window.addEventListener('DOMContentLoaded', function () {
@@ -277,6 +278,45 @@ select.inline-edit{width:auto;min-width:50px}
   <a href="https://bullochman.github.io/lws-roster-extractor/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Roster</a>·
   <a href="#" style="color:#c9a961;text-decoration:none;margin:0 4px;font-weight:600" aria-current="page">Hive</a>
 </div>
+
+<!-- Warzone / season context strip (same pattern as the other 6 tools) -->
+<div style="background:linear-gradient(180deg,#0d1424 0%,#0a0e1a 100%);border-bottom:1px solid rgba(201,169,97,0.15);padding:10px 12px;text-align:center;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans KR',sans-serif;font-size:12.5px">
+  <div id="lws-warzone-selector" style="display:inline-flex;margin-right:8px"></div>
+  <span id="lws-season-billboard" style="color:#c9a961;font-weight:600;margin-left:12px;letter-spacing:.03em"></span>
+  <div id="lws-season-hint" style="font-size:11px;color:#7a8290;margin-top:4px;max-width:900px;margin-left:auto;margin-right:auto"></div>
+</div>
+
+<script defer>
+// Populate the season billboard from LWSSeasons whenever ready or context changes.
+(function () {
+  function updateBillboard() {
+    if (!window.LWSSeasons || typeof window.LWSSeasons.resolve !== 'function') return;
+    window.LWSSeasons.resolve().then(function (ctx) {
+      var el = document.getElementById('lws-season-billboard');
+      var hint = document.getElementById('lws-season-hint');
+      if (!el || !ctx || !ctx.season) return;
+      var s = ctx.season;
+      var name = (s.name && (s.name.en || s.name.ko)) || s.id;
+      var wk = ctx.week ? (' · Week ' + ctx.week) : '';
+      var wz = ctx.warzone ? (' · Warzone ' + ctx.warzone) : '';
+      el.textContent = name + wk + wz;
+      // If not S2, note that MG/Stronghold are S2 concepts.
+      if (hint) {
+        if (s.id !== 's2-polar-storm') {
+          hint.textContent = 'Marshall’s Guard (3×3) and Military Stronghold (21×21) formations are Season 2 concepts. This tool works, but your season may have different landing mechanics. See ' + name + ' details in the Season Timeline.';
+        } else {
+          hint.textContent = '';
+        }
+      }
+    }).catch(function () { /* silent */ });
+  }
+  window.addEventListener('DOMContentLoaded', function () {
+    setTimeout(updateBillboard, 400); // give seasons-lib a moment to auto-mount
+  });
+  window.addEventListener('lws:warzone-changed', updateBillboard);
+  window.addEventListener('lws:season-changed', updateBillboard);
+})();
+</script>
 
 <header style="position:relative">
   <button id="lang-toggle" title="Switch to Korean" style="position:absolute;top:0;right:0;background:#0a0a14;border:1px solid #444488;color:#8888cc;font-family:'Courier New',monospace;font-size:11px;letter-spacing:.5px;border-radius:14px;padding:4px 12px;cursor:pointer;transition:border-color .12s,color .12s">한국어</button>
