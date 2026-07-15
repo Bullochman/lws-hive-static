@@ -287,29 +287,169 @@ select.inline-edit{width:auto;min-width:50px}
 </div>
 
 <script defer>
-// Populate the season billboard from LWSSeasons whenever ready or context changes.
+// Populate the season billboard + FORMATION dropdown from LWSSeasons whenever
+// the resolved context changes. Each season may declare its own formations[]
+// under mechanics_config; we swap the dropdown options to match, but under
+// the hood we still resolve to the two existing render modes (mg / stronghold)
+// since S1/S3–S7 formations reuse the S2 renderers 1:1 per the design spec.
 (function () {
+  // Cache the last-loaded formation list so the layout-mode change handler
+  // (defined later in the main script) can look up display labels + warnings
+  // for whichever preset the user picks.
+  window.__hiveFormations = { list: [], seasonId: null };
+
+  // Map any formation.key → the underlying renderer mode ('mg' or 'stronghold').
+  // Preference: slot_algorithm (authoritative), falling back to a key-prefix
+  // heuristic for the S2 legacy keys ('mg', 'stronghold') where slot_algorithm
+  // may not be set.
+  function formationRenderMode(f) {
+    if (!f) return 'mg';
+    if (f.slot_algorithm === 'mg_pack') return 'mg';
+    if (f.slot_algorithm === 'corner_first_round_robin') return 'stronghold';
+    if (f.key === 'mg') return 'mg';
+    if (f.key === 'stronghold') return 'stronghold';
+    if (/^mg[-_]/.test(f.key)) return 'mg';
+    return 'stronghold'; // sensible default for alliance-center / bank / megahive
+  }
+
+  // Icon per formation family — matches the design spec's icon hints.
+  function formationIcon(f) {
+    if (f.icon) return f.icon;
+    var k = f.key || '';
+    if (k === 'mg' || k.indexOf('mg-') === 0) return '⚑';
+    if (k === 'stronghold' || k.indexOf('stronghold-') === 0) return '🏰';
+    if (k.indexOf('alliance-center') === 0) return '🏛';
+    if (k.indexOf('bank-') === 0) return '🏦';
+    if (k.indexOf('megahive-') === 0) return '🕸';
+    return '◈';
+  }
+
+  function pickLangLabel(o, lang) {
+    if (!o) return '';
+    return o[lang] || o.en || o.ko || o.kr || Object.values(o)[0] || '';
+  }
+
+  function currentLang() {
+    // The main script uses global LANG ('en' or 'ko'). Fall back to <html lang>.
+    if (typeof window.LANG === 'string') return window.LANG;
+    var htmlLang = (document.documentElement.lang || 'en').toLowerCase();
+    return htmlLang.indexOf('ko') === 0 ? 'ko' : 'en';
+  }
+
+  function refreshFormationDropdown(formations, seasonName) {
+    var sel = document.getElementById('layout-mode');
+    if (!sel) return;
+    var lang = currentLang();
+    var prev = sel.value; // remember what was picked before we rewrite
+    // Clear existing options
+    while (sel.firstChild) sel.removeChild(sel.firstChild);
+
+    if (!formations || !formations.length) {
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.disabled = true;
+      opt.selected = true;
+      opt.textContent = (seasonName || 'This season') + ' has no traditional hive formation';
+      sel.appendChild(opt);
+      sel.disabled = true;
+      sel.title = 'The current season does not use a hive-style formation. Use the Season Timeline for placement guidance.';
+      return;
+    }
+    sel.disabled = false;
+    sel.title = '';
+
+    formations.forEach(function (f) {
+      var opt = document.createElement('option');
+      // The <option value> is the underlying render mode. If two formations
+      // both resolve to 'stronghold' we append the formation key so the
+      // dropdown still remembers the selection.
+      var mode = formationRenderMode(f);
+      opt.value = mode + '::' + (f.key || mode);
+      opt.textContent = formationIcon(f) + ' ' + pickLangLabel(f.display_name, lang);
+      if (f.confidence === 'speculative') {
+        opt.textContent += ' (speculative)';
+      }
+      opt.dataset.formationKey = f.key || '';
+      opt.dataset.renderMode = mode;
+      sel.appendChild(opt);
+    });
+
+    // Try to preserve previous selection where possible:
+    // 1. Exact match on formation.key (e.g. reloading with the same season)
+    // 2. Match on render mode (e.g. switching from S2 'mg' to S3 'mg-3x3')
+    // 3. Fall back to first option
+    var target = null;
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === prev) { target = sel.options[i].value; break; }
+    }
+    if (!target) {
+      // Try current cfg.layout.mode from the main script
+      var currentMode = (window.cfg && window.cfg.layout && window.cfg.layout.mode) || 'mg';
+      for (var j = 0; j < sel.options.length; j++) {
+        if (sel.options[j].dataset.renderMode === currentMode) { target = sel.options[j].value; break; }
+      }
+    }
+    if (!target && sel.options.length) target = sel.options[0].value;
+    if (target) sel.value = target;
+  }
+
+  function warningsBulletList(formation, lang) {
+    if (!formation || !formation.warnings || !formation.warnings.length) return '';
+    return formation.warnings.map(function (w) {
+      return '\n  • ' + (w[lang] || w.en || '');
+    }).join('');
+  }
+  // Expose so the layout-change handler further down the file can prepend
+  // warnings to the confirm() prompt.
+  window.__hiveFormationWarningsText = warningsBulletList;
+
   function updateBillboard() {
     if (!window.LWSSeasons || typeof window.LWSSeasons.resolve !== 'function') return;
     window.LWSSeasons.resolve().then(function (ctx) {
       var el = document.getElementById('lws-season-billboard');
       var hint = document.getElementById('lws-season-hint');
-      if (!el || !ctx || !ctx.season) return;
+      if (!ctx || !ctx.season) return;
       var s = ctx.season;
-      var name = (s.name && (s.name.en || s.name.ko)) || s.id;
+      var lang = currentLang();
+      var name = pickLangLabel(s.name, lang) || s.id;
       var wk = ctx.week ? (' · Week ' + ctx.week) : '';
-      var wz = ctx.warzone ? (' · Warzone ' + ctx.warzone) : '';
-      el.textContent = name + wk + wz;
-      // If not S2, note that MG/Stronghold are S2 concepts.
+      var wz = ctx.warzone_id ? (' · Warzone ' + ctx.warzone_id) : '';
+      if (el) el.textContent = name + wk + wz;
+
+      var formations = (s.mechanics_config && s.mechanics_config.formations) || [];
+      window.__hiveFormations = { list: formations, seasonId: s.id };
+      refreshFormationDropdown(formations, name);
+
       if (hint) {
-        if (s.id !== 's2-polar-storm') {
-          hint.textContent = 'Marshall’s Guard (3×3) and Military Stronghold (21×21) formations are Season 2 concepts. This tool works, but your season may have different landing mechanics. See ' + name + ' details in the Season Timeline.';
+        if (formations.length) {
+          var names = formations.map(function (f) { return pickLangLabel(f.display_name, lang); }).filter(Boolean).join(' · ');
+          var speculative = formations.some(function (f) { return f.confidence === 'speculative'; });
+          hint.innerHTML = 'Formations for <strong>' + name + '</strong>: ' + names +
+            (speculative ? ' <span style="color:#c9a961">⚠ speculative until official info arrives</span>' : '') +
+            '. See the Season Timeline for full mechanics.';
+        } else if (s.status === 'confirmed-no-details') {
+          hint.textContent = name + ' formations are pattern-projected from prior seasons. Details will firm up when First Fun publishes the official announcement.';
         } else {
-          hint.textContent = '';
+          hint.textContent = name + ' has no traditional hive formation — see the Season Timeline for placement guidance.';
         }
+      }
+
+      // Also toggle the Season 2 hero banner visibility: only show on S2.
+      // Dismissal state is keyed per-season so the S3 banner (when we add one)
+      // wouldn't be silenced by an old S2 dismissal.
+      var hero = document.getElementById('s2-hero');
+      if (hero) {
+        var dismissedKey = 'hiveSeasonHeroDismissed:' + s.id;
+        var globalDismissed = localStorage.getItem('hiveS2HeroDismissed') === '1';
+        var perSeasonDismissed = localStorage.getItem(dismissedKey) === '1';
+        var shouldShow = (s.id === 's2-polar-storm') && !globalDismissed && !perSeasonDismissed;
+        hero.style.display = shouldShow ? 'block' : 'none';
       }
     }).catch(function () { /* silent */ });
   }
+  // Expose for the main init() to re-run after cfg loads.
+  window.__hiveUpdateBillboard = updateBillboard;
+
   window.addEventListener('DOMContentLoaded', function () {
     setTimeout(updateBillboard, 400); // give seasons-lib a moment to auto-mount
   });
@@ -721,6 +861,7 @@ const I18N = {
     // Confirms
     conf_switch_sh:           "Switch to Military Stronghold formation?\n\nThis clears all current grid placements (they don't map between formations) — your member list and stats are preserved. You can re-run ⚡ Auto-Assign afterward.",
     conf_switch_mg:           "Switch back to Marshall's Guard formation?\n\nThis clears all current grid placements.",
+    conf_switch_formation:    "Switch to ${formation_name}?\n\nThis clears all current grid placements (they don't map between formations) — your member list and stats are preserved. You can re-run ⚡ Auto-Assign afterward.",
     conf_unassign:            'Remove ${name} from the grid? (They stay in the roster)',
     conf_delete:              'Permanently delete ${name} from the roster?',
     conf_clear_grid:          'Unassign everyone from the grid? Member data is kept — just removes all placements.',
@@ -924,6 +1065,7 @@ const I18N = {
     fb_thanks:                '✓ 감사합니다! 피드백이 기록되었습니다.',
     conf_switch_sh:           '군사 요새 배치로 전환하시겠습니까?\n\n현재 모든 그리드 배치가 초기화됩니다 (배치 방식 간 좌표는 호환되지 않음) — 연맹원 명단과 스탯은 유지됩니다. 이후 ⚡ 자동 배치를 다시 실행할 수 있습니다.',
     conf_switch_mg:           '원수 근위대 배치로 되돌리시겠습니까?\n\n현재 모든 그리드 배치가 초기화됩니다.',
+    conf_switch_formation:    '${formation_name} 배치로 전환하시겠습니까?\n\n현재 모든 그리드 배치가 초기화됩니다 (배치 방식 간 좌표 호환 안 됨) — 연맹원 명단과 스탯은 유지됩니다. 이후 ⚡ 자동 배치를 다시 실행할 수 있습니다.',
     conf_unassign:            '${name}님을 그리드에서 배치 해제하시겠습니까? (명단에는 유지됩니다)',
     conf_delete:              '${name}님을 명단에서 영구 삭제하시겠습니까?',
     conf_clear_grid:          '모든 그리드 배치를 해제하시겠습니까? 연맹원 정보는 유지되며 배치만 초기화됩니다.',
@@ -1751,19 +1893,65 @@ function renderAll(){
   // Sync alliance name input
   const inp = document.getElementById('alliance-name-input');
   if(document.activeElement !== inp) inp.value = cfg.alliance_name || '';
-  // Sync layout dropdown
+  // Sync layout dropdown — handle both legacy ('mg' | 'stronghold') and
+  // composite ('mode::formationKey') option values.
   const lm = document.getElementById('layout-mode');
-  if(lm && cfg.layout && cfg.layout.mode && lm.value !== cfg.layout.mode){
-    lm.value = cfg.layout.mode;
+  if(lm && cfg.layout && cfg.layout.mode){
+    const desired = cfg.layout.mode;
+    let match = null;
+    for(const opt of lm.options){
+      if(opt.value === desired){ match = opt.value; break; }
+      if(opt.dataset && opt.dataset.renderMode === desired){ match = opt.value; break; }
+    }
+    if(match && lm.value !== match) lm.value = match;
   }
 }
 
 // ── Layout-mode dropdown handler ───────────────────────────────────────────────
+// The dropdown value is either a plain legacy mode ('mg' | 'stronghold') OR a
+// composite "mode::formationKey" (e.g. 'stronghold::alliance-center-hive').
+// We split on '::' and pass just the render mode to /api/set-layout so the
+// fake-server logic doesn't change.
+function _currentComposite(){
+  const sel = document.getElementById('layout-mode');
+  if(!sel) return '';
+  // Find the composite value whose renderMode matches cfg.layout.mode
+  const current = cfg.layout?.mode || 'mg';
+  for(const opt of sel.options){
+    if(opt.dataset && opt.dataset.renderMode === current) return opt.value;
+  }
+  return current;
+}
 document.getElementById('layout-mode').addEventListener('change', async (e) => {
-  const mode = e.target.value;
-  if(!confirm(mode === 'stronghold' ? t('conf_switch_sh') : t('conf_switch_mg'))){
-    // Reset dropdown to current mode
-    e.target.value = cfg.layout?.mode || 'mg';
+  const rawValue = e.target.value;
+  const parts = rawValue.split('::');
+  const mode = parts[0] || 'mg';
+  const formationKey = parts[1] || mode;
+
+  // Look up formation (for label + warnings)
+  const formations = (window.__hiveFormations && window.__hiveFormations.list) || [];
+  const formation = formations.find(f => f.key === formationKey) || null;
+  const lang = (typeof LANG === 'string' ? LANG : 'en');
+  const displayLabel = formation
+    ? ((formation.display_name && (formation.display_name[lang] || formation.display_name.en)) || formationKey)
+    : (mode === 'stronghold' ? (LANG==='ko' ? '군사 요새' : "Military Stronghold") : (LANG==='ko' ? '원수 근위대' : "Marshall's Guard"));
+
+  // Base confirm text (falls back to the legacy strings for S2 to keep exact
+  // wording R5s are used to)
+  let confirmText;
+  if(formationKey === 'stronghold' || formationKey === 'mg'){
+    confirmText = mode === 'stronghold' ? t('conf_switch_sh') : t('conf_switch_mg');
+  } else {
+    confirmText = t('conf_switch_formation', { formation_name: displayLabel });
+  }
+  // Append per-formation warnings, if any
+  if(formation && typeof window.__hiveFormationWarningsText === 'function'){
+    const w = window.__hiveFormationWarningsText(formation, lang);
+    if(w) confirmText += '\n\n' + (LANG==='ko' ? '⚠ 주의사항:' : '⚠ Notes:') + w;
+  }
+
+  if(!confirm(confirmText)){
+    e.target.value = _currentComposite();
     return;
   }
   const d = await api('/api/set-layout', {mode});
@@ -1771,14 +1959,10 @@ document.getElementById('layout-mode').addEventListener('change', async (e) => {
     cfg = d.config;
     if(mode === 'stronghold' && !strongholdSlots) await loadStrongholdSlots();
     renderAll();
-    // Translate the layout label from the preset (server sends English)
-    const label = mode === 'stronghold'
-      ? (LANG==='ko' ? '군사 요새' : "Military Stronghold")
-      : (LANG==='ko' ? '원수 근위대' : "Marshall's Guard");
-    toast(t(d.evicted ? 't_switched_evicted' : 't_switched', {label, evicted:d.evicted}));
+    toast(t(d.evicted ? 't_switched_evicted' : 't_switched', {label:displayLabel, evicted:d.evicted}));
   } else {
     toast(d.error || t('t_switch_failed'), true);
-    e.target.value = cfg.layout?.mode || 'mg';
+    e.target.value = _currentComposite();
   }
 });
 
@@ -2128,14 +2312,17 @@ document.getElementById('lang-toggle').addEventListener('click', () => {
   setLang(LANG === 'en' ? 'ko' : 'en');
 });
 
-// ── Season 2 hero (dismissible, persists via localStorage) ─────────────────────
-(function initS2Hero(){
+// ── Season hero (dismissible, persists per-season via localStorage) ────────────
+// Visibility is now driven by updateBillboard() so the banner only shows on
+// warzones tagged for the season that the copy is written for (Season 2 today).
+// Dismissal writes both the legacy key (for existing users' state) and a
+// per-season key so future seasons get their own dismissal state.
+(function initSeasonHero(){
   const hero = document.getElementById('s2-hero');
-  const dismissed = localStorage.getItem('hiveS2HeroDismissed') === '1';
-  if(hero && !dismissed) hero.style.display = 'block';
   document.getElementById('s2-dismiss')?.addEventListener('click', () => {
-    hero.style.display = 'none';
+    if(hero) hero.style.display = 'none';
     localStorage.setItem('hiveS2HeroDismissed', '1');
+    localStorage.setItem('hiveSeasonHeroDismissed:s2-polar-storm', '1');
   });
 })();
 
@@ -2145,8 +2332,12 @@ applyI18n();
 (async function init(){
   try {
     cfg = await fetch('/api/config').then(r=>r.json());
+    window.cfg = cfg; // expose so the billboard script can read cfg.layout.mode
     if(cfg.layout && cfg.layout.use_tile_coords) await loadStrongholdSlots();
     renderAll();
+    // Re-trigger the billboard so the FORMATION dropdown gets populated from
+    // the current warzone's season (in case seasons-lib resolved before cfg).
+    if(typeof window.__hiveUpdateBillboard === 'function') window.__hiveUpdateBillboard();
   } catch(e) {
     document.body.innerHTML = `
       <div style="padding:60px;color:#ff6666;font-family:monospace">

@@ -34,7 +34,61 @@
         "doomsday_cycle_days": 7,
         "cities_per_alliance": null,
         "captures_per_day": null,
-        "protection_hours": null
+        "protection_hours": null,
+        "formations": [
+          {
+            "key": "mg-3x3",
+            "display_name": {
+              "en": "Marshall's Guard Platform (3×3)",
+              "kr": "마샬 가드 (3×3)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Marshall's Guard 3×3 event platform (permanent alliance event object)",
+              "kr": "마샬 가드 3×3 이벤트 플랫폼 (상시 동맹 이벤트 오브젝트)"
+            },
+            "member_size": 3,
+            "gap_tiles": 0,
+            "center_tiles": 3,
+            "max_rings": 4,
+            "slot_algorithm": "mg_pack",
+            "rank_priority": "strongest_inward",
+            "notes": "Ring capacity ≈ ring_distance × 8. Recommended surrounding grid 10×10 planner cells.",
+            "kb_refs": ["08-alliance-systems.md:216", "08-alliance-systems.md:221-227"]
+          },
+          {
+            "key": "stronghold-21x21",
+            "display_name": {
+              "en": "Military Stronghold (21×21, 4-ring)",
+              "kr": "요새 (21×21, 4링)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Military Stronghold 21×21 fortress (S1 seasonal building, captured from Crimson Legion; guarded by NPC Corruptor)",
+              "kr": "군사 요새 21×21 (S1 시즌 건물, 크림슨 군단으로부터 점령)"
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 21,
+            "max_rings": 4,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "warnings": [
+              {
+                "key": "s1_vr_gate",
+                "en": "S1-only: rally leaders in Ring 1 must clear the Stronghold's Virus Resistance gate or their rallies deal ~0 damage. VRI-stacked leaders take precedence over pure-power ordering.",
+                "kr": "S1 전용: 링 1의 집회 리더는 요새의 바이러스 저항 게이트를 통과해야 함. 저항 부족 시 집회 데미지 ≈ 0."
+              }
+            ],
+            "notes": "Origin of the 4-ring corner-anchored pattern. 128 slots total (R1=20, R2=28, R3=36, R4=44).",
+            "kb_refs": [
+              "05-season-1-crimson-plague.md:63-95",
+              "05-season-1-crimson-plague.md:96-113",
+              "05-season-1-crimson-plague.md:242-252",
+              "08-alliance-systems.md:229-250"
+            ]
+          }
+        ]
       },
       "tools_that_apply": ["hive_planner", "roster_extractor", "season_timeline"],
       "milestones": [
@@ -103,7 +157,46 @@
           { "level": 5, "week": 3, "day": 3 },
           { "level": 6, "week": 3, "day": 6 }
         ],
-        "wanderer_coal_reward_l180": 200000
+        "wanderer_coal_reward_l180": 200000,
+        "formations": [
+          {
+            "key": "mg",
+            "display_name": {
+              "en": "Marshall's Guard (3×3, no gaps)",
+              "kr": "원수 근위대 (3×3, 간격 없음)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Marshall's Guard 3×3 event platform",
+              "kr": "원수 근위대 3×3 이벤트 플랫폼"
+            },
+            "member_size": 3,
+            "gap_tiles": 0,
+            "center_tiles": 3,
+            "max_rings": 4,
+            "slot_algorithm": "mg_pack",
+            "rank_priority": "strongest_inward"
+          },
+          {
+            "key": "stronghold",
+            "display_name": {
+              "en": "Military Stronghold (21×21, 2-tile gaps)",
+              "kr": "군사 요새 (21×21, 2타일 간격)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Alliance Furnace + 21×21 Military Stronghold",
+              "kr": "동맹 화로 + 21×21 군사 요새"
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 21,
+            "max_rings": 4,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "notes": "S2 default. Existing tool behavior preserved. See heat-simulator + freeze-risk for thermal considerations layered on top of pure placement."
+          }
+        ]
       },
       "tools_that_apply": [
         "hive_planner",
@@ -195,7 +288,80 @@
         },
         "radar_ruins_final_stage_odds_pct": 2.016,
         "faction_names": ["scarlet_legion", "golden_tribe"],
-        "season_battle_pass_days": 48
+        "season_battle_pass_days": 48,
+        "formations": [
+          {
+            "key": "mg-3x3",
+            "display_name": {
+              "en": "Marshall's Guard (3×3 platform)",
+              "kr": "연맹 훈련 (마셜스 가드)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Marshall's Guard 3×3 event platform",
+              "kr": "마샬 가드 3×3 이벤트 플랫폼"
+            },
+            "member_size": 3,
+            "gap_tiles": 0,
+            "center_tiles": 3,
+            "max_rings": 4,
+            "slot_algorithm": "mg_pack",
+            "rank_priority": "strongest_inward",
+            "notes": "Identical to S2 Marshall's Guard formation. No thermal reversal; pure shortest-march ordering.",
+            "kb_refs": ["08-alliance-systems.md:221-227"]
+          },
+          {
+            "key": "alliance-center-hive",
+            "display_name": {
+              "en": "Alliance Center Hive (Golden Kingdom)",
+              "kr": "얼라이언스 센터 벌집 (골든 킹덤)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Alliance Center (5×5 world footprint) — Spice producer, in-range buff projector, Sandworm knockback shield",
+              "kr": "얼라이언스 센터 (5×5) — 향신료 생산, 범위 버프, 모래벌레 밀림 방지"
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 5,
+            "max_rings": 4,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "warnings": [
+              {
+                "key": "s3_sandworm_ac_range",
+                "en": "Every base MUST stay inside Alliance Center range — Large Sandworms teleport out-of-range bases to random map locations.",
+                "kr": "모든 기지는 얼라이언스 센터 범위 안에 있어야 함. 범위 밖은 대형 모래벌레가 무작위 위치로 순간이동시킴."
+              }
+            ],
+            "notes": "S2 Stronghold renderer with center building 5×5 and strongest inward. Cap: 8 cities + 8 Digging Strongholds concurrent.",
+            "kb_refs": [
+              "07-future-seasons.md:34-95",
+              "07-future-seasons.md:761-886",
+              "08-alliance-systems.md:217"
+            ]
+          },
+          {
+            "key": "stronghold-21x21",
+            "display_name": {
+              "en": "Digging Stronghold (21×21 defensive)",
+              "kr": "발굴 요새 (21×21 방어)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Digging Stronghold (21×21 tile fortress, produces Mithril — S3 seasonal analogue of S1's Military Stronghold)",
+              "kr": "발굴 요새 (21×21, 미스릴 생산 — S1 군사 요새의 S3 대응물)"
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 21,
+            "max_rings": 4,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "notes": "Identical to S1/S2 Stronghold formation. Cap: 8 held simultaneously, 2 captures/day.",
+            "kb_refs": ["07-future-seasons.md:34-95", "08-alliance-systems.md:229-248"]
+          }
+        ]
       },
       "tools_that_apply": [
         "hive_planner",
@@ -313,7 +479,68 @@
         },
         "celebration_weeks": 4,
         "transfer_surge_unlock": { "week": 8, "day": 1, "duration_days": 14 },
-        "hunting_oni_warzone_goal": 100
+        "hunting_oni_warzone_goal": 100,
+        "formations": [
+          {
+            "key": "mg-3x3",
+            "display_name": {
+              "en": "Marshall's Guard 3×3 Hive",
+              "kr": "마셜 가드 3×3 벌집"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Marshall's Guard 3×3 event platform (season-agnostic)",
+              "kr": "마샬 가드 3×3 이벤트 플랫폼 (모든 시즌 공통)"
+            },
+            "member_size": 3,
+            "gap_tiles": 0,
+            "center_tiles": 3,
+            "max_rings": 4,
+            "slot_algorithm": "mg_pack",
+            "rank_priority": "strongest_inward",
+            "notes": "Identical to S2 MG. S4 title-role reshuffle: Muse alliance skill replaced by Tesla Coil Butler Skill.",
+            "kb_refs": ["08-alliance-systems.md:221-227", "07-future-seasons.md:196"]
+          },
+          {
+            "key": "alliance-center-hive-s4",
+            "display_name": {
+              "en": "Alliance Center Hive (S4 Copper Wars)",
+              "kr": "얼라이언스 센터 벌집 (시즌 4)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Alliance Center (5×5) + 3 secondary buildings (Stone / Oil / Magatama Warehouses). Lighthouse is warzone-shared, NOT the per-alliance anchor.",
+              "kr": "얼라이언스 센터 (5×5) + 3개 보조 건물 (돌·기름·마가타마 창고). 등대는 전쟁구역 공용."
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 11,
+            "max_rings": 4,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "min_ac_spacing_tiles": 11,
+            "warnings": [
+              {
+                "key": "s4_ac_spacing",
+                "en": "Hard rule: minimum 11-tile spacing center-to-center between your AC and any neighboring alliance's AC.",
+                "kr": "필수: 얼라이언스 센터 간 최소 11타일 중심-대-중심 간격."
+              },
+              {
+                "key": "s4_copper_wars_declaration",
+                "en": "Copper Wars declaration range narrows weekly (W4→W7). Consider tightening the hive footprint as season progresses.",
+                "kr": "코퍼 전쟁 선언 범위는 매주 좁아짐 (4주→7주). 시즌 진행에 따라 벌집을 더 조이는 것 고려."
+              }
+            ],
+            "notes": "Reuses S2 Stronghold corner-anchored ring algorithm. center_tiles=11 approximates the AC (5×5) + 3 adjacent secondary buildings. Copper Wars plunder: 3% per secondary + 6% for AC, 15% cap/round.",
+            "kb_refs": [
+              "07-future-seasons.md:98-149",
+              "07-future-seasons.md:137",
+              "07-future-seasons.md:212",
+              "07-future-seasons.md:189-196",
+              "08-alliance-systems.md:213-219"
+            ]
+          }
+        ]
       },
       "tools_that_apply": [
         "hive_planner",
@@ -413,7 +640,67 @@
         "season_skin_attack_bonus_pct": 5,
         "season_skin_name": "Tycoon's Mansion",
         "pre_season_weeks": 2,
-        "pre_season_events": ["gold_prospecting", "area_selection", "capitol_conquest"]
+        "pre_season_events": ["gold_prospecting", "area_selection", "capitol_conquest"],
+        "formations": [
+          {
+            "key": "mg-3x3",
+            "display_name": {
+              "en": "Marshall's Guard 3×3 Hive",
+              "kr": "마셜 가드 3×3 벌집"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Marshall's Guard event platform (3×3, season-agnostic)",
+              "kr": "마샬 가드 이벤트 플랫폼 (3×3, 모든 시즌 공통)"
+            },
+            "member_size": 3,
+            "gap_tiles": 0,
+            "center_tiles": 3,
+            "max_rings": 4,
+            "slot_algorithm": "mg_pack",
+            "rank_priority": "strongest_inward",
+            "notes": "Identical to S2 MG. Base-game hive, unchanged in S5.",
+            "kb_refs": ["08-alliance-systems.md:207-226", "08-alliance-systems.md:235-248"]
+          },
+          {
+            "key": "bank-stronghold-ring",
+            "display_name": {
+              "en": "Bank Stronghold Defensive Ring",
+              "kr": "은행 요새 방어 링"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Bank Stronghold (S5 seasonal fortress — captured, holds CrystalGold deposits). Footprint speculative-by-analogy to S1 Military Stronghold.",
+              "kr": "은행 요새 (S5 시즌 요새 — 크리스탈골드 예치. S1 군사 요새 대비 크기는 추정)"
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 21,
+            "max_rings": 4,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "confidence": "speculative",
+            "warnings": [
+              {
+                "key": "s5_bank_footprint_speculative",
+                "en": "Bank Stronghold tile footprint is not published. This preset uses S1's 21×21 by analogy — adjust center_tiles when official dims arrive.",
+                "kr": "은행 요새 크기 미공개. 본 프리셋은 S1의 21×21을 근거로 추정."
+              },
+              {
+                "key": "s5_war_days_only",
+                "en": "Bank Strongholds are only contested on Wed/Sat war days. Alliance Safe Time (7–15h immunity, R5-set) can turn off 1 of 3 daily war slots.",
+                "kr": "은행 요새는 수/토 전쟁일에만 경쟁. 얼라이언스 세이프 타임 (7–15h 면역)으로 하루 3개 전쟁 슬롯 중 1개 면제 가능."
+              }
+            ],
+            "notes": "Reuses S1/S2 Stronghold renderer. Cap: 4 Banks default, up to 12 with cities.",
+            "kb_refs": [
+              "07-future-seasons.md:241-246",
+              "07-future-seasons.md:250-253",
+              "07-future-seasons.md:515-526",
+              "08-alliance-systems.md:229-247"
+            ]
+          }
+        ]
       },
       "tools_that_apply": [
         "hive_planner",
@@ -519,7 +806,93 @@
         "global_expedition_rounds": 3,
         "global_expedition_round_duration_days": 14,
         "global_expedition_round_weeks": [2, 4, 6],
-        "pre_season_weeks": 2
+        "pre_season_weeks": 2,
+        "formations": [
+          {
+            "key": "mg-3x3",
+            "display_name": {
+              "en": "Marshall's Guard Hive (3×3 platform)",
+              "kr": "총사령관 훈련 벌집 (3×3 이벤트 플랫폼)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Marshall's Guard event platform (3×3, R4/R5-placed)",
+              "kr": "마샬 가드 이벤트 플랫폼 (3×3, R4/R5 배치)"
+            },
+            "member_size": 3,
+            "gap_tiles": 0,
+            "center_tiles": 3,
+            "max_rings": 4,
+            "slot_algorithm": "mg_pack",
+            "rank_priority": "strongest_inward",
+            "notes": "Canonical MG. Persists into S6 unchanged.",
+            "kb_refs": ["08-alliance-systems.md:173", "08-alliance-systems.md:207-227"]
+          },
+          {
+            "key": "stronghold-21x21",
+            "display_name": {
+              "en": "Military Stronghold Hive (21×21, 4-ring)",
+              "kr": "군사 요새 벌집 (21×21, 4-링)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Military Stronghold (21×21 tile fortress surrounded by mud)",
+              "kr": "군사 요새 (21×21, 진흙에 둘러싸인 요새)"
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 21,
+            "max_rings": 4,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "notes": "Canonical Stronghold. Reused as substrate for per-alliance defensive hives inside the mega-hive.",
+            "kb_refs": ["08-alliance-systems.md:229-248"]
+          },
+          {
+            "key": "megahive-faction-pact",
+            "display_name": {
+              "en": "S6 Mega-Hive (Alliance Pact cluster)",
+              "kr": "S6 메가하이브 (동맹 조약 군집)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Shared Alliance Assembly Point (R5-set flag). No environmental building anchors it — R5 chooses placement based on faction strategic zone.",
+              "kr": "공유 얼라이언스 집결 지점 (R5 설정 깃발). 환경 앵커 건물 없음."
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 21,
+            "max_rings": 8,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "supports_multi_alliance": true,
+            "max_alliances": 6,
+            "warnings": [
+              {
+                "key": "s6_fog_clustering",
+                "en": "Fog visibility is shared among nearby allies — tighter mega-hive = wider vision cone. Exact fog-share radius not published.",
+                "kr": "안개 시야는 인접 아군과 공유 — 더 조밀한 메가하이브 = 더 넓은 시야."
+              },
+              {
+                "key": "s6_alliance_pact",
+                "en": "Alliance Pacts (7-day non-aggression, up to 200 members) formalize the multi-alliance cluster. Same-faction only.",
+                "kr": "동맹 조약 (7일 불가침, 최대 200명) — 같은 팩션만 가능."
+              },
+              {
+                "key": "s6_missile_silo_corners",
+                "en": "Missile silos cluster at mega-hive CORNERS (community consensus, exact pitch unpublished).",
+                "kr": "미사일 격납고는 메가하이브 모서리에 배치 (정확한 간격 미공개)."
+              }
+            ],
+            "notes": "Extends corner-anchored algorithm outward to 8 rings so multiple allied sub-alliances can layer. Each sub-alliance internally still runs mg-3x3 or stronghold-21x21.",
+            "kb_refs": [
+              "07-future-seasons.md:277-311",
+              "07-future-seasons.md:338",
+              "07-future-seasons.md:359",
+              "08-alliance-systems.md:345-361"
+            ]
+          }
+        ]
       },
       "tools_that_apply": [
         "hive_planner",
@@ -586,7 +959,62 @@
         "expected_t12_troop_unlock_possible": true,
         "expected_beneath_the_ruins_style_minigame": true,
         "leak_video_id_pulled": "71mM-FUjb90",
-        "announcement_video_id": "LXy5yb8bHWE"
+        "announcement_video_id": "LXy5yb8bHWE",
+        "formations": [
+          {
+            "key": "mg-3x3",
+            "display_name": {
+              "en": "Marshall's Guard Hive (3×3 platform)",
+              "kr": "총사령관의 근위대 벌집 (3×3)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Marshall's Guard 3×3 event platform (permanent cross-season object, presumed to persist)",
+              "kr": "마샬 가드 3×3 이벤트 플랫폼 (상시 오브젝트, 유지 가정)"
+            },
+            "member_size": 3,
+            "gap_tiles": 0,
+            "center_tiles": 3,
+            "max_rings": 4,
+            "slot_algorithm": "mg_pack",
+            "rank_priority": "strongest_inward",
+            "confidence": "speculative",
+            "notes": "Projection from S1–S6 pattern; MG has never changed. Safe to ship.",
+            "kb_refs": ["08-alliance-systems.md:207-227"]
+          },
+          {
+            "key": "stronghold-21x21",
+            "display_name": {
+              "en": "Seasonal Central Building Hive (21×21 defensive)",
+              "kr": "시즌 중앙 건물 벌집 (21×21 방어형)"
+            },
+            "grid_shape": "square",
+            "center_landmark": {
+              "en": "Season 7 central building (TBD — placeholder). S1→S6 pattern: each season ships a central shared building (Military Stronghold / Alliance Furnace / Blessing Fountain / Lighthouse / Bank Stronghold / Altars).",
+              "kr": "시즌 7 중앙 건물 (미정 — 자리표시자). S1→S6 패턴상 시즌마다 중앙 공유 건물 등장."
+            },
+            "member_size": 3,
+            "gap_tiles": 2,
+            "center_tiles": 21,
+            "max_rings": 4,
+            "slot_algorithm": "corner_first_round_robin",
+            "rank_priority": "strongest_inward",
+            "confidence": "speculative",
+            "warnings": [
+              {
+                "key": "s7_unpublished",
+                "en": "S7 theme, name, and central building shape are unpublished as of 2026-07-15. This preset is a projection from S1–S6 — revisit when First Fun publishes an official announcement.",
+                "kr": "S7 테마·중앙 건물 형태 미공개 (2026-07-15 기준). 본 프리셋은 S1–S6 패턴 추정."
+              }
+            ],
+            "notes": "If S7's central building is not 21×21, re-parameterize center_tiles when official info arrives.",
+            "kb_refs": [
+              "07-future-seasons.md:367-385",
+              "07-future-seasons.md:656",
+              "08-alliance-systems.md:229-248"
+            ]
+          }
+        ]
       },
       "tools_that_apply": [
         "hive_planner",
