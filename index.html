@@ -5,6 +5,42 @@
 <title>Alliance Hive Grid Tool – Last War Survival</title>
 <!-- Static GH Pages build: intercept /api/* with in-browser handlers backed by localStorage. -->
 <script src="static/fake-server.js"></script>
+<script src="static/roster-picker.js" defer></script>
+<script>
+// On first visit (empty state), auto-load the RONY / TINO 티노 94-member roster.
+window.addEventListener('DOMContentLoaded', function () {
+  var raw = localStorage.getItem('hivegrid_state');
+  var isEmpty = false;
+  if (!raw) {
+    isEmpty = true;
+  } else {
+    try {
+      var st = JSON.parse(raw);
+      var members = (st && st.members) || {};
+      isEmpty = Object.keys(members).length === 0;
+    } catch (e) { isEmpty = true; }
+  }
+  if (!isEmpty) return;
+  // Fetch RONY roster + push it through the existing /api/upload-csv path (which the client's
+  // fake-server already knows how to parse and merge into hivegrid_state).
+  fetch('data/tino-alliance-94.csv')
+    .then(function (r) { return r.ok ? r.text() : Promise.reject('http ' + r.status); })
+    .then(function (text) {
+      return fetch('/api/upload-csv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csv: text })
+      });
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      console.log('[hive] auto-loaded RONY default roster:', d);
+      if (typeof window.reloadHiveState === 'function') window.reloadHiveState();
+      else location.reload();
+    })
+    .catch(function (e) { console.warn('[hive] RONY auto-load failed:', e); });
+});
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
