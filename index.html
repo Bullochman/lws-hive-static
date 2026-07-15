@@ -44,23 +44,29 @@ window.addEventListener('DOMContentLoaded', function () {
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d0d1a;--bg2:#111122;--bg3:#0a0a14;
-  --border:#252540;--text:#c0c0d0;--dim:#55557a;
-  --r5:#da8fff;--r4:#ffd700;--r3:#00bfff;--r2:#44dd66;--r1:#6699ff;
+  --bg:#0a0e1a;--bg2:#111122;--bg3:#0a0a14;
+  --border:#252540;--border-accent:rgba(201,169,97,0.30);
+  --text:#c0c0d0;--dim:#55557a;--muted:#7a8290;
+  --accent:#c9a961;
+  /* Rank palette: R1 base → R2 green → R3 blue → R4 purple → R5 gold (highest, per LWS convention) */
+  --r5:#ffd700;--r4:#da8fff;--r3:#00bfff;--r2:#44dd66;--r1:#6699ff;
   --mg:#ff5555;--empty:#333350;
   --cell-w:128px;--cell-h:84px;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
+  --mono:'JetBrains Mono','SF Mono','Courier New',monospace;
 }
-body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;padding:20px 24px;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);padding:20px 24px;min-height:100vh;-webkit-font-smoothing:antialiased;letter-spacing:.005em}
 
 /* ── Header ─────────────────────────────── */
-header{margin-bottom:10px}
-h1{color:#fff;font-size:19px;letter-spacing:.5px}
-.meta{color:var(--dim);font-size:11px;margin-top:5px;line-height:1.6}
+header{margin-bottom:14px}
+h1{color:#fff;font-size:22px;letter-spacing:.35px;font-weight:700}
+.meta{color:var(--dim);font-size:12px;margin-top:6px;line-height:1.6;font-family:var(--mono)}
 
 /* ── Legend ─────────────────────────────── */
-.legend{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0 18px;font-size:11px}
-.leg{display:flex;align-items:center;gap:5px;cursor:default}
-.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 18px;font-size:11.5px}
+.leg{display:inline-flex;align-items:center;gap:6px;cursor:default;padding:4px 10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:14px;transition:background .15s,border-color .15s}
+.leg:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.10)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
 
 /* ── Grid ───────────────────────────────── */
 .grid-wrap{overflow-x:auto;margin-bottom:36px}
@@ -120,9 +126,11 @@ td.cell.drag-over{background:#20204a!important;outline:2px dashed #8888ff}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;align-items:center;justify-content:center}
 .overlay.on{display:flex}
 .modal{
-  background:#12122a;border:1px solid #3a3a66;border-radius:10px;
-  padding:26px 28px;width:380px;max-width:95vw;
-  box-shadow:0 8px 40px rgba(0,0,0,.6);
+  background:linear-gradient(180deg,#141432 0%,#0f0f26 100%);
+  border:1px solid rgba(201,169,97,0.20);border-radius:12px;
+  padding:28px 30px;width:420px;max-width:95vw;
+  box-shadow:0 20px 80px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,0.03) inset;
+  backdrop-filter:blur(12px);
 }
 .modal h3{color:#fff;font-size:15px;margin-bottom:18px;border-bottom:1px solid #2a2a44;padding-bottom:10px}
 .field{margin-bottom:13px}
@@ -133,9 +141,10 @@ td.cell.drag-over{background:#20204a!important;outline:2px dashed #8888ff}
 }
 .field input:focus,.field select:focus{outline:none;border-color:#6666cc;background:#0c0c20}
 .modal-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
-button{padding:8px 15px;border:none;border-radius:5px;font-family:'Courier New',monospace;font-size:12px;cursor:pointer;transition:opacity .15s,transform .1s}
-button:hover{opacity:.82}
+button{padding:9px 18px;border:none;border-radius:6px;font-family:var(--sans);font-weight:600;font-size:12.5px;letter-spacing:.015em;cursor:pointer;transition:opacity .15s,transform .1s,box-shadow .15s,border-color .15s}
+button:hover{opacity:.92;box-shadow:0 3px 12px rgba(0,0,0,.35)}
 button:active{transform:scale(.97)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .btn-save{background:#3535aa;color:#dde}
 .btn-unassign{background:#5a2020;color:#ffaaaa}
 .btn-delete{background:#7a1010;color:#ffcccc}
@@ -265,8 +274,8 @@ select.inline-edit{width:auto;min-width:50px}
   <a href="https://bullochman.github.io/lws-coal-burn-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Coal</a>·
   <a href="https://bullochman.github.io/lws-city-capture-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">City</a>·
   <a href="https://bullochman.github.io/lws-season-timeline-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Timeline</a>·
-  <a href="https://bullochman.github.io/lws-hive-static/" style="color:#c9a961;text-decoration:none;margin:0 4px;font-weight:600">Hive</a>·
-  <a href="https://bullochman.github.io/lws-hive-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Hive</a>
+  <a href="https://bullochman.github.io/lws-roster-extractor/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Roster</a>·
+  <a href="#" style="color:#c9a961;text-decoration:none;margin:0 4px;font-weight:600" aria-current="page">Hive</a>
 </div>
 
 <header style="position:relative">
