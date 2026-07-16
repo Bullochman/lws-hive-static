@@ -36,8 +36,21 @@ window.addEventListener('DOMContentLoaded', function () {
     .then(function (r) { return r.json(); })
     .then(function (d) {
       console.log('[hive] auto-loaded RONY default roster:', d);
-      if (typeof window.reloadHiveState === 'function') window.reloadHiveState();
-      else location.reload();
+      // Wait for the main init to expose reloadHiveState, then call it in-place
+      // (no page reload — avoids the visible "wiggle" flash on iPad).
+      var _tries = 0;
+      var _try = function () {
+        _tries += 1;
+        if (typeof window.reloadHiveState === 'function') {
+          window.reloadHiveState();
+        } else if (_tries < 20) {
+          setTimeout(_try, 200);
+        } else {
+          // Last resort: reload if the state function never came online.
+          location.reload();
+        }
+      };
+      _try();
     })
     .catch(function (e) { console.warn('[hive] RONY auto-load failed:', e); });
 });
@@ -2329,15 +2342,22 @@ document.getElementById('lang-toggle').addEventListener('click', () => {
 // Apply translations on first paint (before /api/config returns)
 applyI18n();
 
-(async function init(){
+async function reloadHiveState(){
   try {
     cfg = await fetch('/api/config').then(r=>r.json());
-    window.cfg = cfg; // expose so the billboard script can read cfg.layout.mode
+    window.cfg = cfg;
     if(cfg.layout && cfg.layout.use_tile_coords) await loadStrongholdSlots();
     renderAll();
-    // Re-trigger the billboard so the FORMATION dropdown gets populated from
-    // the current warzone's season (in case seasons-lib resolved before cfg).
     if(typeof window.__hiveUpdateBillboard === 'function') window.__hiveUpdateBillboard();
+  } catch(e) {
+    console.warn('[hive] reloadHiveState failed:', e);
+  }
+}
+window.reloadHiveState = reloadHiveState;
+
+(async function init(){
+  try {
+    await reloadHiveState();
   } catch(e) {
     document.body.innerHTML = `
       <div style="padding:60px;color:#ff6666;font-family:monospace">
