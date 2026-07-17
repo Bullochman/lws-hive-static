@@ -1248,6 +1248,10 @@ function setLang(lang){
   if(lang !== 'en' && lang !== 'ko') return;
   LANG = lang;
   localStorage.setItem('hiveLang', lang);
+  // Mirror to the suite-wide `lws_lang` key so switching in Hive carries
+  // over to Timeline / Heat / Freeze / Coal / City / Landing on next visit.
+  try { localStorage.setItem('lws_lang', lang); } catch (e) { /* ignore */ }
+  try { window.dispatchEvent(new CustomEvent('lws:lang-changed', { detail: { lang: lang } })); } catch (e) { /* ignore */ }
   applyI18n();
   if(cfg) renderAll();   // re-render dynamic content (roster, meta, grid)
 }
