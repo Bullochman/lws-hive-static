@@ -277,6 +277,38 @@ select.inline-edit{width:auto;min-width:50px}
 }
 #toast.show{opacity:1}
 #toast.err{background:#1f0f0f;border-color:#6a3a3a;color:#cc8888}
+
+/* ---- mobile responsive (added 2026-07-17) ---- */
+@media (max-width: 900px) {
+  body { padding: 12px 10px; }
+  .roster-pay-row { flex-direction: column; gap: 18px; }
+  .roster-pay-row .tip-section {
+    flex: 1 1 100%; width: 100%;
+    border-left: none; padding-left: 0;
+    border-top: 1px solid #151525; padding-top: 18px;
+    margin-top: 0;
+  }
+  .roster-pay-row .roster-section { max-width: 100%; width: 100%; }
+  table.roster { max-width: 100%; font-size: 11px; }
+  .tip-box { min-width: 0; width: 100%; box-sizing: border-box; }
+  .feedback-form { max-width: 100%; padding: 14px 12px; box-sizing: border-box; }
+  #alliance-name-input { width: 100%; max-width: 260px; box-sizing: border-box; }
+  .modal { padding: 20px 16px; width: 92vw; max-width: 420px; box-sizing: border-box; }
+  .btn-tip, .btn-unlock { font-size: 12px; padding: 8px 12px; }
+  .qr-img, img[alt*="QR"] { max-width: 140px; height: auto; }
+  /* wrap all direct-child tables in scroll containers */
+  .roster-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  h1 { font-size: clamp(20px, 5.5vw, 28px); }
+  h2 { font-size: clamp(16px, 4.5vw, 22px); }
+}
+@media (max-width: 520px) {
+  body { padding: 8px 6px; }
+  table.roster { font-size: 10.5px; }
+  table.roster th, table.roster td { padding: 3px 4px; }
+  .toolbar { gap: 5px; }
+  .toolbar button { font-size: 11px; padding: 6px 8px; }
+  .modal { padding: 16px 12px; }
+}
 </style>
   <script defer src="static/lws-track.js"></script>
 </head>
@@ -284,19 +316,19 @@ select.inline-edit{width:auto;min-width:50px}
 <div id="main-app">
 <!-- suite-nav (part of R5TOOLS.IO) -->
 <div style="background:#0a0e1a;border-bottom:1px solid rgba(201,169,97,0.2);padding:6px 12px;font-family:system-ui,-apple-system,sans-serif;font-size:11px;letter-spacing:.06em;color:#7a8290;text-align:center;position:relative;z-index:99998">
-  <span>Part of the </span>
+  <span data-i18n="suiteNavPart">Part of the </span>
   <a href="https://r5tools.io" target="_blank" rel="noopener" style="color:#c9a961;text-decoration:none;font-weight:600">R5TOOLS.IO</a>
-  <span> Last War: Survival alliance toolkit — </span>
-  <a href="https://bullochman.github.io/lws-landing-planner-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Landing</a>·
-  <a href="https://bullochman.github.io/lws-heat-simulator-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Heat</a>·
-  <a href="https://bullochman.github.io/lws-freeze-risk-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Freeze</a>·
-  <a href="https://bullochman.github.io/lws-coal-burn-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Coal</a>·
-  <a href="https://bullochman.github.io/lws-city-capture-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">City</a>·
-  <a href="https://bullochman.github.io/lws-season-timeline-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Timeline</a>·
-  <a href="https://roster.r5tools.io/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Roster</a>·
+  <span data-i18n="suiteNavToolkit"> Last War: Survival alliance toolkit — </span>
+  <a href="https://bullochman.github.io/lws-landing-planner-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navLanding">Landing</span></a>·
+  <a href="https://bullochman.github.io/lws-heat-simulator-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navHeat">Heat</span></a>·
+  <a href="https://bullochman.github.io/lws-freeze-risk-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navFreeze">Freeze</span></a>·
+  <a href="https://bullochman.github.io/lws-coal-burn-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navCoal">Coal</span></a>·
+  <a href="https://bullochman.github.io/lws-city-capture-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navCity">City</span></a>·
+  <a href="https://bullochman.github.io/lws-season-timeline-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navTimeline">Timeline</span></a>·
+  <a href="https://roster.r5tools.io/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navRoster">Roster</span></a>·
   <a href="#" style="color:#c9a961;text-decoration:none;margin:0 4px;font-weight:600" aria-current="page">Hive</a>·
-  <a href="https://bullochman.github.io/lws-profile-studio-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">Profile</a>·<a href="https://bullochman.github.io/lws-vs-days-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px">VS Days</a>
-<a href="mailto:hello@r5tools.io?subject=r5tools.io%20feedback&body=Tool%3A%20Hive%20Grid%20Manager%0AWhat%27s%20missing%3A%20%0AWhat%27s%20broken%3A%20%0AWhat%27s%20slow%3A%20%0AWhat%20I%20love%3A%20" style="background:rgba(88,101,242,0.15);color:#5865F2;text-decoration:none;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:8px;font-size:10px;letter-spacing:.04em;text-transform:uppercase">🚧 BETA · Feedback</a></div>
+  <a href="https://bullochman.github.io/lws-profile-studio-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navProfile">Profile</span></a>·<a href="https://bullochman.github.io/lws-vs-days-static/" style="color:#a8b0c0;text-decoration:none;margin:0 4px"><span data-i18n="navVsDays">VS Days</span></a>
+<a href="mailto:hello@r5tools.io?subject=r5tools.io%20feedback&body=Tool%3A%20Hive%20Grid%20Manager%0AWhat%27s%20missing%3A%20%0AWhat%27s%20broken%3A%20%0AWhat%27s%20slow%3A%20%0AWhat%20I%20love%3A%20" style="background:rgba(88,101,242,0.15);color:#5865F2;text-decoration:none;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:8px;font-size:10px;letter-spacing:.04em;text-transform:uppercase"><span data-i18n="betaFeedbackPill">🚧 BETA · Feedback</span></a></div>
 
 <!-- Warzone / season context strip (same pattern as the other 6 tools) -->
 <div style="background:linear-gradient(180deg,#0d1424 0%,#0a0e1a 100%);border-bottom:1px solid rgba(201,169,97,0.15);padding:10px 12px;text-align:center;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans KR',sans-serif;font-size:12.5px">
@@ -942,6 +974,20 @@ const I18N = {
     // Language toggle
     lang_toggle_label:        '한국어',
     lang_toggle_title:        'Switch to Korean',
+    // ---- shared suite-nav (r5tools.io toolkit strip) ----
+    suiteNavPart:             'Part of the ',
+    suiteNavToolkit:          ' Last War: Survival alliance toolkit — ',
+    navLanding:               'Landing',
+    navHeat:                  'Heat',
+    navFreeze:                'Freeze',
+    navCoal:                  'Coal',
+    navCity:                  'City',
+    navTimeline:              'Timeline',
+    navHive:                  'Hive',
+    navRoster:                'Roster',
+    navProfile:               'Profile',
+    navVsDays:                'VS Days',
+    betaFeedbackPill:         '🚧 BETA · Feedback',
   },
   ko: {
     title:                    '◈ 라스트 워: 서바이벌 — 연맹 벌집 배치도 ◈',
@@ -1141,10 +1187,28 @@ const I18N = {
     s2_dismiss:               '✕ 닫기',
     lang_toggle_label:        'EN',
     lang_toggle_title:        'Switch to English',
+    // ---- shared suite-nav (r5tools.io toolkit strip) ----
+    suiteNavPart:             '이 도구는 ',
+    suiteNavToolkit:          ' 라스트 워: 서바이벌 얼라이언스 툴킷의 일부입니다 — ',
+    navLanding:               '랜딩',
+    navHeat:                  '히트',
+    navFreeze:                '동결',
+    navCoal:                  '석탄',
+    navCity:                  '도시',
+    navTimeline:              '타임라인',
+    navHive:                  '벌집',
+    navRoster:                '명단',
+    navProfile:               '프로필',
+    navVsDays:                'VS 데이',
+    betaFeedbackPill:         '🚧 베타 · 피드백',
   }
 };
 
 let LANG = (function(){
+  // Prefer the suite-wide `lws_lang` preference so switching language on any
+  // sibling tool carries over into the Hive Planner without a second toggle.
+  const shared = localStorage.getItem('lws_lang');
+  if(shared === 'en' || shared === 'ko') return shared;
   const saved = localStorage.getItem('hiveLang');
   if(saved === 'en' || saved === 'ko') return saved;
   return (navigator.language || 'en').toLowerCase().startsWith('ko') ? 'ko' : 'en';
