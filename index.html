@@ -482,13 +482,14 @@ select.inline-edit{width:auto;min-width:50px}
         if (formations.length) {
           var names = formations.map(function (f) { return pickLangLabel(f.display_name, lang); }).filter(Boolean).join(' · ');
           var speculative = formations.some(function (f) { return f.confidence === 'speculative'; });
-          hint.innerHTML = 'Formations for <strong>' + name + '</strong>: ' + names +
-            (speculative ? ' <span style="color:#c9a961">⚠ speculative until official info arrives</span>' : '') +
-            '. See the Season Timeline for full mechanics.';
+          // i18n via t()
+          hint.innerHTML = t('formations_for') + ' <strong>' + name + '</strong>: ' + names +
+            (speculative ? ' <span style="color:#c9a961">' + t('speculative_warn') + '</span>' : '') +
+            t('see_timeline_suffix');
         } else if (s.status === 'confirmed-no-details') {
-          hint.textContent = name + ' formations are pattern-projected from prior seasons. Details will firm up when First Fun publishes the official announcement.';
+          hint.textContent = name + ' ' + t('formations_pattern_projected');
         } else {
-          hint.textContent = name + ' has no traditional hive formation — see the Season Timeline for placement guidance.';
+          hint.textContent = name + ' ' + t('no_hive_formation');
         }
       }
 
@@ -995,6 +996,11 @@ const I18N = {
     navProfile:               'Profile',
     navVsDays:                'VS Days',
     betaFeedbackPill:         '🚧 BETA · Feedback',
+    formations_for:           'Formations for',
+    speculative_warn:         '⚠ speculative until official info arrives',
+    see_timeline_suffix:      '. See the Season Timeline for full mechanics.',
+    formations_pattern_projected: 'formations are pattern-projected from prior seasons. Details will firm up when First Fun publishes the official announcement.',
+    no_hive_formation:        'has no traditional hive formation — see the Season Timeline for placement guidance.',
   },
   ko: {
     title:                    '◈ 라스트 워: 서바이벌 — 연맹 벌집 배치도 ◈',
@@ -1208,6 +1214,11 @@ const I18N = {
     navProfile:               '프로필',
     navVsDays:                'VS 데이',
     betaFeedbackPill:         '🚧 베타 · 피드백',
+    formations_for:           '대형:',
+    speculative_warn:         '⚠ 공식 정보 발표 전까지 추정치',
+    see_timeline_suffix:      '. 전체 메커니즘은 시즌 타임라인에서 확인하세요.',
+    formations_pattern_projected: '대형은 이전 시즌 패턴에서 추정한 값입니다. First Fun의 공식 발표 후 확정됩니다.',
+    no_hive_formation:        '전통적인 벌집 대형이 없습니다 — 배치 가이드는 시즌 타임라인을 참조하세요.',
   }
 };
 
