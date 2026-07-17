@@ -5,6 +5,7 @@
 <title>Alliance Hive Grid Tool – Last War Survival</title>
 <!-- Static GH Pages build: intercept /api/* with in-browser handlers backed by localStorage. -->
 <script src="static/fake-server.js"></script>
+<script src="static/lws-discord.js" defer></script>
 <script src="static/roster-picker.js" defer></script>
 <script src="static/seasons-lib.js" defer></script>
 <script>
@@ -503,6 +504,8 @@ select.inline-edit{width:auto;min-width:50px}
     <button class="btn-clear"  id="btn-clear-grid"   data-i18n="btn_clear_grid" data-i18n-title="btn_clear_grid_title" title="Unassign everyone — keep member list">🗑 Clear Grid</button>
     <button class="btn-danger" id="btn-clear-all"    data-i18n="btn_reset_all" data-i18n-title="btn_reset_all_title" title="Wipe everything and start fresh">💥 Reset All</button>
     <button class="btn-export" id="btn-export-png"   data-i18n="btn_export_png" data-i18n-title="btn_export_png_title" title="Export grid as PNG image for Discord/WhatsApp">📸 Export PNG</button>
+    <span id="lws-discord-slot" style="display:inline-block;margin-left:6px"></span>
+    <span id="lws-discord-gear-slot" style="display:inline-block;margin-left:6px"></span>
     <input type="file" id="csv-file-input" accept=".csv" style="display:none">
   </div>
 </header>
@@ -2288,16 +2291,40 @@ function exportPNG(){
     ctx.textAlign='left';
   }
 
-  canvas.toBlob(blob=>{
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url; a.download=`hive_grid_${new Date().toISOString().slice(0,10)}.png`;
-    a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
-  },'image/png');
-  toast(t('t_png_exported'));
+  return new Promise(resolve => {
+    canvas.toBlob(blob=>{
+      const fname = `hive_grid_${new Date().toISOString().slice(0,10)}.png`;
+      window.__lwsLatestPng = { blob, filename: fname, context: 'Hive Grid Manager' };
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url; a.download=fname;
+      a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
+      toast(t('t_png_exported'));
+      resolve({ blob, filename: fname });
+    },'image/png');
+  });
 }
 
 document.getElementById('btn-export-png').onclick = exportPNG;
+
+// Post to Discord — reuses the same canvas rendering, skips the file download
+document.addEventListener('DOMContentLoaded', function () {
+  var slot = document.getElementById('lws-discord-slot');
+  var gearSlot = document.getElementById('lws-discord-gear-slot');
+  if (window.LWSDiscord) {
+    if (slot) LWSDiscord.renderPostButton(slot, {
+      getBlob: async () => {
+        // Re-render the canvas so we always get the freshest state
+        await exportPNG();
+        return window.__lwsLatestPng && window.__lwsLatestPng.blob;
+      },
+      filename: 'hive_grid.png',
+      contextText: 'Alliance Hive Plan',
+      toolName: 'Hive Grid Manager',
+    });
+    if (gearSlot) LWSDiscord.renderSettingsButton(gearSlot);
+  }
+});
 
 // ── Feedback form ───────────────────────────────────────────────────────────────
 document.getElementById('btn-fb-submit').onclick = async () => {
