@@ -12,7 +12,7 @@
 <script src="static/seasons-lib.js" defer></script>
 <script src="static/lws-countdown.js" defer></script>
 <script>
-// On first visit (empty state), auto-load the RONY / TINO 티노 94-member roster.
+// On first visit (empty state), auto-load the RONY / Moonpetal 94-member roster.
 window.addEventListener('DOMContentLoaded', function () {
   var raw = localStorage.getItem('hivegrid_state');
   var isEmpty = false;
@@ -28,7 +28,7 @@ window.addEventListener('DOMContentLoaded', function () {
   if (!isEmpty) return;
   // Fetch RONY roster + push it through the existing /api/upload-csv path (which the client's
   // fake-server already knows how to parse and merge into hivegrid_state).
-  fetch('data/tino-alliance-94.csv')
+  fetch('data/moonpetal-circle-94.csv')
     .then(function (r) { return r.ok ? r.text() : Promise.reject('http ' + r.status); })
     .then(function (text) {
       return fetch('/api/upload-csv', {
