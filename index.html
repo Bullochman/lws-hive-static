@@ -109,9 +109,12 @@ table.grid{border-collapse:collapse;border:2px solid #ffffff22}
 .sh-slot.r-4{box-shadow:0 0 2px #44884444 inset}
 .sh-slot.drag-src{opacity:.4;outline:2px dashed #6666ff}
 .sh-slot.drag-over{outline:2px solid #88ffaa;background:#1a2a1a !important;z-index:6}
-.sh-slot .sh-name{font-size:9px;font-weight:bold;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 1px}
-.sh-slot .sh-rk{font-size:7px;opacity:.85}
-.sh-slot .sh-coord{font-size:6.5px;color:#55557a}
+/* Font sizes tuned for the 2×2 HQ footprint (32px at SH_TILE_PX=16). Slots
+   are dense; the name column is only ~30px wide so we ellipsize aggressively
+   and expose the full name via the .title tooltip. */
+.sh-slot .sh-name{font-size:8px;font-weight:bold;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 1px;line-height:1.1}
+.sh-slot .sh-rk{font-size:6.5px;opacity:.85;line-height:1.1}
+.sh-slot .sh-coord{font-size:6px;color:#55557a;line-height:1.1}
 .sh-slot.ring-1-edge{border-color:#ff444466}
 .sh-ringbadge{position:absolute;font-size:9px;color:#444466;pointer-events:none;font-weight:bold;letter-spacing:1px}
 
@@ -528,9 +531,9 @@ select.inline-edit{width:auto;min-width:50px}
   <div class="meta" id="meta" data-i18n="connecting">Connecting to server…</div>
   <div class="toolbar">
     <label style="color:#6666aa;font-size:11px;display:inline-flex;align-items:center;gap:4px;letter-spacing:.5px"><span data-i18n="formation">FORMATION</span>
-      <select id="layout-mode" data-i18n-title="formation_title" title="Switch between Marshall's Guard event (3×3) and Military Stronghold (21×21, 2-tile spacing, 4 rings)">
-        <option value="mg" data-i18n="fm_mg">⚑ Marshall's Guard (3×3, no gaps)</option>
-        <option value="stronghold" data-i18n="fm_sh">❄ Polar Storm / Military Stronghold (21×21, 2-tile gaps)</option>
+      <select id="layout-mode" data-i18n-title="formation_title" title="Switch between Marshall's Guard hive (tight 2×2 HQ pack) and Military Stronghold (21×21 furnace, 2×2 HQs, 2-tile gaps, 4 rings)">
+        <option value="mg" data-i18n="fm_mg">⚑ Marshall's Guard (2×2 HQ, tight pack)</option>
+        <option value="stronghold" data-i18n="fm_sh">❄ Polar Storm / Military Stronghold (21×21 furnace, 2×2 HQs, 2-tile gaps)</option>
       </select>
     </label>
     <button class="btn-auto"   id="btn-auto-assign"  data-i18n="btn_auto" data-i18n-title="btn_auto_title" title="Auto-assign members to grid cells">⚡ Auto-Assign</button>
@@ -560,7 +563,7 @@ select.inline-edit{width:auto;min-width:50px}
     <h3 style="margin-bottom:14px;color:#fff" data-i18n="mg_modal_title">📍 Set Marshall's Guard Coordinates</h3>
     <label><span data-i18n="mg_game_x">MG Game X</span><input id="mg-x" type="number" style="margin-left:10px;width:90px;background:#111;color:#eee;border:1px solid #444;padding:4px 8px;border-radius:4px"></label><br><br>
     <label><span data-i18n="mg_game_y">MG Game Y</span><input id="mg-y" type="number" style="margin-left:10px;width:90px;background:#111;color:#eee;border:1px solid #444;padding:4px 8px;border-radius:4px"></label>
-    <p style="color:#888;font-size:11px;margin-top:10px" data-i18n="mg_modal_hint">Grid step is 3 tiles per cell. Changing this shifts all coordinate labels.</p>
+    <p style="color:#888;font-size:11px;margin-top:10px" data-i18n="mg_modal_hint">Grid step is 2 tiles per cell (KB-canonical 2×2 HQ footprint). Changing the anchor shifts all coordinate labels.</p>
     <div style="margin-top:16px;display:flex;gap:8px">
       <button class="btn-save" id="btn-mg-save" data-i18n="btn_save">💾 Save</button>
       <button class="btn-cancel" id="btn-mg-cancel" data-i18n="btn_cancel">Cancel</button>
@@ -590,7 +593,7 @@ select.inline-edit{width:auto;min-width:50px}
 <div class="sh-wrap" id="stronghold-wrap">
   <div style="color:#cc6666;font-size:11px;margin-bottom:10px;letter-spacing:.4px" data-i18n="sh_banner" data-i18n-mode="html">
     🏰 <strong>MILITARY STRONGHOLD</strong> &nbsp;·&nbsp; 21×21 tile fortress &nbsp;·&nbsp;
-    Each alliance member = 3×3 tiles, 2-tile gap between every member &nbsp;·&nbsp;
+    Each alliance member = 2×2 tile HQ, 2-tile gap between every member (4-tile pitch) &nbsp;·&nbsp;
     <span style="color:#ff8888">Ring 1 = strongest (against the mud)</span>
   </div>
   <div class="sh-canvas" id="stronghold-canvas"></div>
@@ -773,9 +776,9 @@ const I18N = {
     connecting:               'Connecting to server…',
     // Toolbar
     formation:                'FORMATION',
-    formation_title:          "Switch between Marshall's Guard event (3×3) and Military Stronghold (21×21, 2-tile spacing, 4 rings)",
-    fm_mg:                    "⚑ Marshall's Guard (3×3, no gaps)",
-    fm_sh:                    '❄ Polar Storm / Military Stronghold (21×21, 2-tile gaps)',
+    formation_title:          "Switch between Marshall's Guard hive (tight 2×2 HQ pack) and Military Stronghold (21×21 furnace, 2×2 HQs, 2-tile gaps, 4 rings)",
+    fm_mg:                    "⚑ Marshall's Guard (2×2 HQ, tight pack)",
+    fm_sh:                    '❄ Polar Storm / Military Stronghold (21×21 furnace, 2×2 HQs, 2-tile gaps)',
     btn_auto:                 '⚡ Auto-Assign',
     btn_auto_title:           'Auto-assign members to grid cells',
     btn_csv_up:               '📂 Upload CSV',
@@ -801,17 +804,17 @@ const I18N = {
     mg_modal_title:           "📍 Set Marshall's Guard Coordinates",
     mg_game_x:                'MG Game X',
     mg_game_y:                'MG Game Y',
-    mg_modal_hint:            'Grid step is 3 tiles per cell. Changing this shifts all coordinate labels.',
+    mg_modal_hint:            'Grid step is 2 tiles per cell (KB-canonical 2×2 HQ footprint). Changing the anchor shifts all coordinate labels.',
     btn_save:                 '💾 Save',
     btn_cancel:               'Cancel',
     // Watermark bar
     wm_free:                  '🔓 <strong style="color:#4444aa">Alliance Hive Grid Tool</strong> &nbsp;·&nbsp; Free version — <a href="#tip-section">unlock full features for $10 one-time →</a>',
     wm_unlocked:              '✅ <strong style="color:#224422">Full version unlocked</strong> &nbsp;·&nbsp; Alliance Hive Grid Tool',
     // Stronghold banner
-    sh_banner:                '🏰 <strong>MILITARY STRONGHOLD</strong> &nbsp;·&nbsp; 21×21 tile fortress &nbsp;·&nbsp; Each alliance member = 3×3 tiles, 2-tile gap between every member &nbsp;·&nbsp; <span style="color:#ff8888">Ring 1 = strongest (against the mud)</span>',
+    sh_banner:                '🏰 <strong>MILITARY STRONGHOLD</strong> &nbsp;·&nbsp; 21×21 tile fortress &nbsp;·&nbsp; Each alliance member = 2×2 tile HQ, 2-tile gap between every member (4-tile pitch) &nbsp;·&nbsp; <span style="color:#ff8888">Ring 1 = strongest (against the mud)</span>',
     sh_loading:               'Loading stronghold layout…',
     sh_fortress_title:        '🏰 STRONGHOLD',
-    sh_fortress_sub:          '21×21 tiles · 7×7 cells',
+    sh_fortress_sub:          '21×21 tile Alliance Furnace',
     sh_click_move:            '📍 click to move',
     sh_click_move_title:      'Click to change anchor coordinates',
     sh_empty_title:           'Ring ${ring} slot · empty (click to place)',
@@ -863,7 +866,7 @@ const I18N = {
     btn_unassign:             '↩ Unassign',
     btn_delete:               '🗑 Delete',
     // Meta bar
-    meta_sh:                  '🏰 Stronghold centre @ (${x},${y}) &nbsp;│&nbsp; 21×21 tile fortress &nbsp;│&nbsp; 4 rings &nbsp;│&nbsp; ${slots} slots (2-tile gaps) &nbsp;│&nbsp; Members: ${total} total, ${assigned} placed${warn} &nbsp;│&nbsp; <em>Ring 1 = strongest, against the mud</em>',
+    meta_sh:                  '🏰 Stronghold centre @ (${x},${y}) &nbsp;│&nbsp; 21×21 tile fortress &nbsp;│&nbsp; 4 rings &nbsp;│&nbsp; ${slots} slots (2×2 HQ · 2-tile gaps · 4-tile pitch) &nbsp;│&nbsp; Members: ${total} total, ${assigned} placed${warn} &nbsp;│&nbsp; <em>Ring 1 = strongest, against the mud</em>',
     meta_mg:                  '⚑ MG @ (${x},${y}) &nbsp;│&nbsp; Grid: ${cols}×${rows} &nbsp;│&nbsp; Step: ${step} tiles per cell &nbsp;│&nbsp; Members: ${total} total, ${assigned} placed${warn} &nbsp;│&nbsp; <em>Click cell to edit · Drag to move · Auto-saves JSON + CSV</em>',
     meta_warn:                ' &nbsp;│&nbsp; <span style="color:#aa6600">⚠ ${n} members missing HQ/Power — click their cell to fill in</span>',
     // Legend
@@ -1010,9 +1013,9 @@ const I18N = {
     alliance_hint:            '← PNG 내보내기에 표시',
     connecting:               '서버 연결 중…',
     formation:                '배치 방식',
-    formation_title:          '원수 근위대 이벤트(3×3)와 군사 요새(21×21, 2타일 간격, 4링) 사이 전환',
-    fm_mg:                    '⚑ 원수 근위대 (3×3, 간격 없음)',
-    fm_sh:                    '❄ 폴라 스톰 / 군사 요새 (21×21, 2타일 간격)',
+    formation_title:          '원수 근위대 벌집(2×2 기지 밀집)과 군사 요새(21×21 화로, 2×2 기지, 2타일 간격, 4링) 사이 전환',
+    fm_mg:                    '⚑ 원수 근위대 (2×2 기지, 밀집 배치)',
+    fm_sh:                    '❄ 폴라 스톰 / 군사 요새 (21×21 화로, 2×2 기지, 2타일 간격)',
     btn_auto:                 '⚡ 자동 배치',
     btn_auto_title:           '연맹원을 그리드 셀에 자동 배치',
     btn_csv_up:               '📂 CSV 업로드',
@@ -1037,15 +1040,15 @@ const I18N = {
     mg_modal_title:           '📍 원수 근위대 좌표 설정',
     mg_game_x:                'MG 게임 X',
     mg_game_y:                'MG 게임 Y',
-    mg_modal_hint:            '그리드 단위는 셀당 3타일입니다. 이 값을 바꾸면 모든 좌표 라벨이 이동합니다.',
+    mg_modal_hint:            '그리드 단위는 셀당 2타일입니다 (KB 정식 2×2 기지 발자국). 기준 좌표를 바꾸면 모든 좌표 라벨이 이동합니다.',
     btn_save:                 '💾 저장',
     btn_cancel:               '취소',
     wm_free:                  '🔓 <strong style="color:#4444aa">연맹 벌집 배치도</strong> &nbsp;·&nbsp; 무료 버전 — <a href="#tip-section">$10로 정식 버전 잠금해제 →</a>',
     wm_unlocked:              '✅ <strong style="color:#224422">정식 버전 잠금해제됨</strong> &nbsp;·&nbsp; 연맹 벌집 배치도',
-    sh_banner:                '🏰 <strong>군사 요새</strong> &nbsp;·&nbsp; 21×21 타일 요새 &nbsp;·&nbsp; 연맹원 1인 = 3×3 타일, 모든 연맹원 사이 2타일 간격 &nbsp;·&nbsp; <span style="color:#ff8888">1링 = 최강 (진흙 옆)</span>',
+    sh_banner:                '🏰 <strong>군사 요새</strong> &nbsp;·&nbsp; 21×21 타일 요새 &nbsp;·&nbsp; 연맹원 1인 = 2×2 타일 기지, 모든 연맹원 사이 2타일 간격 (4타일 피치) &nbsp;·&nbsp; <span style="color:#ff8888">1링 = 최강 (진흙 옆)</span>',
     sh_loading:               '요새 배치 로드 중…',
     sh_fortress_title:        '🏰 요새',
-    sh_fortress_sub:          '21×21 타일 · 7×7 셀',
+    sh_fortress_sub:          '21×21 타일 동맹 화로',
     sh_click_move:            '📍 클릭하여 이동',
     sh_click_move_title:      '기준 좌표 변경하려면 클릭',
     sh_empty_title:           '${ring}링 자리 · 비어있음 (클릭하여 배치)',
@@ -1093,7 +1096,7 @@ const I18N = {
     field_notes_placeholder:  '선택 사항…',
     btn_unassign:             '↩ 배치 해제',
     btn_delete:               '🗑 삭제',
-    meta_sh:                  '🏰 요새 중심 @ (${x},${y}) &nbsp;│&nbsp; 21×21 타일 요새 &nbsp;│&nbsp; 4링 &nbsp;│&nbsp; ${slots}자리 (2타일 간격) &nbsp;│&nbsp; 연맹원: 총 ${total}명, 배치 ${assigned}명${warn} &nbsp;│&nbsp; <em>1링 = 최강, 진흙 옆</em>',
+    meta_sh:                  '🏰 요새 중심 @ (${x},${y}) &nbsp;│&nbsp; 21×21 타일 요새 &nbsp;│&nbsp; 4링 &nbsp;│&nbsp; ${slots}자리 (2×2 기지 · 2타일 간격 · 4타일 피치) &nbsp;│&nbsp; 연맹원: 총 ${total}명, 배치 ${assigned}명${warn} &nbsp;│&nbsp; <em>1링 = 최강, 진흙 옆</em>',
     meta_mg:                  '⚑ MG @ (${x},${y}) &nbsp;│&nbsp; 그리드: ${cols}×${rows} &nbsp;│&nbsp; 단위: 셀당 ${step}타일 &nbsp;│&nbsp; 연맹원: 총 ${total}명, 배치 ${assigned}명${warn} &nbsp;│&nbsp; <em>셀 클릭 편집 · 드래그 이동 · JSON+CSV 자동 저장</em>',
     meta_warn:                ' &nbsp;│&nbsp; <span style="color:#aa6600">⚠ ${n}명 기지/전투력 미입력 — 셀 클릭하여 입력</span>',
     lg_leader:                '연맹장',
@@ -1290,7 +1293,8 @@ let rosterRowOrder = [];   // names in rendered roster order (for shift-range)
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 // In MG mode (col,row) are cell coords; in stronghold mode they're tile coords
-// (top-left of the member's 3×3 footprint, signed, relative to fortress centre).
+// (top-left of the member's 2×2 HQ footprint, signed, relative to fortress
+// centre — per KB-canonical map math in LWS_Knowledge_Base/kb/16-map-dimensions.md).
 const isStronghold = () => !!cfg.layout && cfg.layout.use_tile_coords;
 
 const cellCoord = (col,row) => {
@@ -1315,7 +1319,8 @@ const chebyshev = (col,row) => {
 function strongholdRing(tx, ty){
   const p = cfg.layout || {};
   const half   = ((p.center_tiles || 21) - 1) / 2;
-  const member = p.member_size  || 3;
+  // 2×2 HQ footprint per KB (was 3 pre-2026-07-20 — buggy 5-tile pitch).
+  const member = p.member_size  || 2;
   const pitch  = member + (p.gap_tiles || 2);
   const dx = Math.max(Math.abs(tx), Math.abs(tx + member - 1));
   const dy = Math.max(Math.abs(ty), Math.abs(ty + member - 1));
@@ -1502,8 +1507,11 @@ function renderGrid(){
 }
 
 // ── Stronghold Rendering ───────────────────────────────────────────────────────
-const SH_TILE_PX = 14;
-const SH_PAD_TILES = 4;        // padding around Ring 4
+// Bumped from 14→16 on 2026-07-20 to compensate for the smaller 2×2 HQ
+// footprint — otherwise each member tile would render at 28px which is too
+// small to read the name label on a 100-member alliance layout.
+const SH_TILE_PX = 16;
+const SH_PAD_TILES = 4;        // padding around outermost ring
 
 function renderStronghold(){
   const canvas = document.getElementById('stronghold-canvas');
@@ -1513,13 +1521,15 @@ function renderStronghold(){
     return;
   }
   const p = cfg.layout || {};
-  const half   = ((p.center_tiles || 21) - 1) / 2;       // 10
-  const member = p.member_size || 3;
+  const half   = ((p.center_tiles || 21) - 1) / 2;       // 10 for a 21-tile fortress
+  // 2×2 HQ footprint per KB (was 3 → 5-tile pitch was wrong).
+  const member = p.member_size || 2;
   const maxRings = p.max_rings || 4;
-  const ringPitch = member + (p.gap_tiles || 2);
+  const ringPitch = member + (p.gap_tiles || 2);         // = 4 tiles per KB Polar Storm
 
   // Outer extent of Ring N (tile coord of outermost tile): half + (N-1)*pitch + member
-  const outerExtent = half + (maxRings - 1) * ringPitch + member;   // = 30 for default preset
+  // Default preset (21 furnace + 4 rings × 4-tile pitch + 2-tile HQ) = 24 → 49×49 tile span.
+  const outerExtent = half + (maxRings - 1) * ringPitch + member;
   const halfTiles = outerExtent + SH_PAD_TILES;                     // padded canvas radius
   const span = halfTiles * 2 + 1;
   canvas.innerHTML = '';
@@ -2269,7 +2279,14 @@ document.querySelectorAll('.btn-sort').forEach(btn => {
 });
 
 // ── PNG Export ──────────────────────────────────────────────────────────────────
+// Router: pick the renderer that matches the current layout mode. Stronghold
+// mode has its own coord math (signed tile offsets around the fortress) so it
+// can't reuse the MG grid renderer directly.
 function exportPNG(){
+  return isStronghold() ? exportStrongholdPNG() : exportMGPNG();
+}
+
+function exportMGPNG(){
   const g = cfg.grid;
   const { cols, rows, mg_col, mg_row } = g;
   const CW=140, CH=76, PAD=24, HEAD=68, FOOT=52;
@@ -2392,6 +2409,173 @@ function exportPNG(){
       toast(t('t_png_exported'));
       resolve({ blob, filename: fname });
     },'image/png');
+  });
+}
+
+// Stronghold-mode PNG: mirrors renderStronghold() but paints to a canvas so
+// R5s can drop the fortress layout straight into Discord. Coordinate math uses
+// the KB-canonical 2×2 HQ footprint (member_size=2) + 2-tile gap = 4-tile pitch.
+async function exportStrongholdPNG(){
+  if(!strongholdSlots) await loadStrongholdSlots();
+  const p = cfg.layout || {};
+  const half   = ((p.center_tiles || 21) - 1) / 2;
+  const member = p.member_size || 2;
+  const maxRings = p.max_rings || 4;
+  const ringPitch = member + (p.gap_tiles || 2);
+  const outerExtent = half + (maxRings - 1) * ringPitch + member;
+  const PAD_TILES = 4;
+  const halfTiles = outerExtent + PAD_TILES;
+  const span = halfTiles * 2 + 1;
+
+  const TP = 22;                                                     // tile-px in export (bigger than on-screen)
+  const PAD = 28, HEAD = 78, FOOT = 60;
+  const CANVAS_TILES = span * TP;
+  const W = CANVAS_TILES + PAD*2;
+  const H = HEAD + CANVAS_TILES + FOOT + PAD*2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = W*2; canvas.height = H*2;                          // retina
+  const ctx = canvas.getContext('2d'); ctx.scale(2,2);
+
+  const RC = {R5:'#da8fff',R4:'#ffd700',R3:'#00bfff',R2:'#44dd66',R1:'#6699ff','':'#555566'};
+  const ringClr = ['#ff7777','#cc9966','#88aacc','#66cc88','#88cc44','#cc88cc'];
+
+  // BG
+  ctx.fillStyle='#08080f'; ctx.fillRect(0,0,W,H);
+
+  // Header
+  const allianceName = (cfg.alliance_name || '').trim();
+  ctx.fillStyle='#ffffff'; ctx.font='bold 17px "Courier New",monospace';
+  ctx.fillText(t('png_title'), PAD, PAD+20);
+  if(allianceName){
+    ctx.fillStyle='#ffdd88'; ctx.font='bold 14px "Courier New",monospace';
+    ctx.fillText(`[ ${allianceName} ]`, PAD, PAD+42);
+  }
+  ctx.fillStyle='#55557a'; ctx.font='10px "Courier New",monospace';
+  const placed = Object.keys(cfg.assignments).length;
+  const subtitleY = allianceName ? PAD+58 : PAD+38;
+  const dateLocale = LANG === 'ko' ? 'ko-KR' : undefined;
+  ctx.fillText(t('png_subtitle', {x:cfg.mg.x, y:cfg.mg.y, placed, date:new Date().toLocaleDateString(dateLocale)}), PAD, subtitleY);
+
+  // Canvas origin (top-left of the tile grid area)
+  const ox = PAD, oy = PAD + HEAD;
+  const px = (tx) => ox + (tx + halfTiles) * TP;
+  const py = (ty) => oy + (ty + halfTiles) * TP;
+
+  // Faint background tile grid so the coord system is legible
+  ctx.strokeStyle = '#12122a'; ctx.lineWidth = 0.5;
+  for(let i=0; i<=span; i++){
+    ctx.beginPath(); ctx.moveTo(ox + i*TP, oy); ctx.lineTo(ox + i*TP, oy + CANVAS_TILES); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ox, oy + i*TP); ctx.lineTo(ox + CANVAS_TILES, oy + i*TP); ctx.stroke();
+  }
+
+  // Fortress (Alliance Furnace) — draws as the central 21×21 (or configured)
+  const fLeft = px(-half), fTop = py(-half);
+  const fSize = (2 * half + 1) * TP;
+  const fGrad = ctx.createLinearGradient(fLeft, fTop, fLeft + fSize, fTop + fSize);
+  fGrad.addColorStop(0, '#5c1a1a'); fGrad.addColorStop(1, '#3a0e0e');
+  ctx.fillStyle = fGrad; ctx.fillRect(fLeft, fTop, fSize, fSize);
+  ctx.strokeStyle = '#ff444466'; ctx.lineWidth = 2;
+  ctx.strokeRect(fLeft+1, fTop+1, fSize-2, fSize-2);
+  ctx.fillStyle = '#ff8888'; ctx.font='bold 14px "Courier New",monospace';
+  ctx.textAlign='center';
+  ctx.fillText(t('sh_fortress_title'), fLeft + fSize/2, fTop + fSize/2 - 8);
+  ctx.font='10px "Courier New",monospace'; ctx.fillStyle = '#cc6666';
+  ctx.fillText(t('sh_fortress_sub'), fLeft + fSize/2, fTop + fSize/2 + 8);
+  ctx.font='9px "Courier New",monospace'; ctx.fillStyle = '#aa5555';
+  ctx.fillText(`(${cfg.mg.x}, ${cfg.mg.y})`, fLeft + fSize/2, fTop + fSize/2 + 22);
+  ctx.textAlign='left';
+
+  // Ring badges (four corners of each ring)
+  for(let r = 1; r <= maxRings; r++){
+    const rOuter = half + (r - 1) * ringPitch + (member - 1);
+    ctx.fillStyle = ringClr[r-1] || '#888';
+    ctx.font='bold 11px "Courier New",monospace';
+    ctx.fillText(`R${r}`, px(-rOuter - 2), py(-rOuter - 1) + 8);
+  }
+
+  // Slots
+  for(const s of strongholdSlots){
+    const {tx, ty, ring} = s;
+    const sx = px(tx), sy = py(ty), ss = member * TP;
+    const key = `${tx},${ty}`;
+    const name = cfg.assignments[key] || null;
+    if(name){
+      const m = cfg.members[name] || {};
+      const c = RC[m.rank||''] || RC[''];
+      // Rank-color underglow
+      const grad = ctx.createLinearGradient(sx, sy, sx + ss, sy + ss);
+      grad.addColorStop(0, c + '33'); grad.addColorStop(1, c + '10');
+      ctx.fillStyle = grad; ctx.fillRect(sx, sy, ss, ss);
+      ctx.strokeStyle = c + 'aa'; ctx.lineWidth = 1;
+      ctx.strokeRect(sx+0.5, sy+0.5, ss-1, ss-1);
+      // Name (truncate to fit) and rank
+      ctx.fillStyle = c; ctx.font='bold 9px "Courier New",monospace';
+      ctx.textAlign = 'center';
+      let dn = name;
+      while(ctx.measureText(dn).width > ss - 4 && dn.length > 3) dn = dn.slice(0, -1);
+      if(dn !== name) dn += '…';
+      ctx.fillText(dn, sx + ss/2, sy + ss/2 - 2);
+      ctx.font='7.5px "Courier New",monospace';
+      ctx.fillText(`${m.rank||'?'}/${m.hq!=null?'HQ'+m.hq:'—'}`, sx + ss/2, sy + ss/2 + 9);
+      ctx.textAlign = 'left';
+    } else {
+      // Empty slot
+      ctx.fillStyle = '#10101a'; ctx.fillRect(sx, sy, ss, ss);
+      ctx.setLineDash([2, 2]);
+      ctx.strokeStyle = '#252540'; ctx.lineWidth = 0.8;
+      ctx.strokeRect(sx+0.5, sy+0.5, ss-1, ss-1);
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#3a3a55'; ctx.font='7px "Courier New",monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`R${ring}`, sx + ss/2, sy + ss/2 + 3);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  // Legend
+  const ly = oy + CANVAS_TILES + 22;
+  const LEGEND = [['R5',t('lg_leader')],['R4',t('lg_r4')],['R3',t('lg_r3')],['R2',t('lg_r2')],['R1',t('lg_r1')]];
+  ctx.font='10px "Courier New",monospace';
+  let lx = PAD;
+  for(const [r,label] of LEGEND){
+    ctx.fillStyle = RC[r];
+    ctx.beginPath(); ctx.arc(lx+5, ly+5, 4.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillText(label, lx+14, ly+9);
+    lx += ctx.measureText(label).width + 30;
+  }
+  ctx.fillStyle='#2a2a44'; ctx.textAlign='right';
+  ctx.font='8px "Courier New",monospace';
+  ctx.fillText(t('png_credit'), W-PAD, H - PAD - 8);
+  ctx.textAlign='left';
+
+  // Watermark
+  if(!cfg.unlocked){
+    ctx.save();
+    ctx.globalAlpha = 0.13;
+    ctx.fillStyle = '#8888ff';
+    ctx.font = 'bold 38px "Courier New",monospace';
+    ctx.textAlign = 'center';
+    for(let wy=140; wy < H-40; wy+=180){
+      ctx.fillText(t('png_watermark'), W/2, wy);
+    }
+    ctx.restore();
+    ctx.fillStyle='#22224a'; ctx.font='9px "Courier New",monospace'; ctx.textAlign='right';
+    ctx.fillText(t('png_free_footer'), W-PAD, H-6);
+    ctx.textAlign='left';
+  }
+
+  return new Promise(resolve => {
+    canvas.toBlob(blob => {
+      const fname = `hive_stronghold_${new Date().toISOString().slice(0,10)}.png`;
+      window.__lwsLatestPng = { blob, filename: fname, context: 'Hive Grid Manager (Stronghold)' };
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = fname;
+      a.click(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+      toast(t('t_png_exported'));
+      resolve({ blob, filename: fname });
+    }, 'image/png');
   });
 }
 

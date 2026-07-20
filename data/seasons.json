@@ -47,7 +47,7 @@
               "en": "Marshall's Guard 3×3 event platform (permanent alliance event object)",
               "kr": "마샬 가드 3×3 이벤트 플랫폼 (상시 동맹 이벤트 오브젝트)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 0,
             "center_tiles": 3,
             "max_rings": 4,
@@ -67,7 +67,7 @@
               "en": "Military Stronghold 21×21 fortress (S1 seasonal building, captured from Crimson Legion; guarded by NPC Corruptor)",
               "kr": "군사 요새 21×21 (S1 시즌 건물, 크림슨 군단으로부터 점령)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 21,
             "max_rings": 4,
@@ -80,7 +80,7 @@
                 "kr": "S1 전용: 링 1의 집회 리더는 요새의 바이러스 저항 게이트를 통과해야 함. 저항 부족 시 집회 데미지 ≈ 0."
               }
             ],
-            "notes": "Origin of the 4-ring corner-anchored pattern. 128 slots total (R1=20, R2=28, R3=36, R4=44).",
+            "notes": "Origin of the 4-ring corner-anchored pattern. 144 slots total (R1=24, R2=32, R3=40, R4=48) under the KB-canonical 2×2 HQ footprint + 2-tile gap = 4-tile pitch.",
             "kb_refs": [
               "05-season-1-crimson-plague.md:63-95",
               "05-season-1-crimson-plague.md:96-113",
@@ -170,7 +170,7 @@
               "en": "Marshall's Guard 3×3 event platform",
               "kr": "원수 근위대 3×3 이벤트 플랫폼"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 0,
             "center_tiles": 3,
             "max_rings": 4,
@@ -188,7 +188,7 @@
               "en": "Alliance Furnace + 21×21 Military Stronghold",
               "kr": "동맹 화로 + 21×21 군사 요새"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 21,
             "max_rings": 4,
@@ -301,7 +301,7 @@
               "en": "Marshall's Guard 3×3 event platform",
               "kr": "마샬 가드 3×3 이벤트 플랫폼"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 0,
             "center_tiles": 3,
             "max_rings": 4,
@@ -321,7 +321,7 @@
               "en": "Alliance Center (5×5 world footprint) — Spice producer, in-range buff projector, Sandworm knockback shield",
               "kr": "얼라이언스 센터 (5×5) — 향신료 생산, 범위 버프, 모래벌레 밀림 방지"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 5,
             "max_rings": 4,
@@ -352,7 +352,7 @@
               "en": "Digging Stronghold (21×21 tile fortress, produces Mithril — S3 seasonal analogue of S1's Military Stronghold)",
               "kr": "발굴 요새 (21×21, 미스릴 생산 — S1 군사 요새의 S3 대응물)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 21,
             "max_rings": 4,
@@ -492,7 +492,7 @@
               "en": "Marshall's Guard 3×3 event platform (season-agnostic)",
               "kr": "마샬 가드 3×3 이벤트 플랫폼 (모든 시즌 공통)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 0,
             "center_tiles": 3,
             "max_rings": 4,
@@ -512,7 +512,7 @@
               "en": "Alliance Center (5×5) + 3 secondary buildings (Stone / Oil / Magatama Warehouses). Lighthouse is warzone-shared, NOT the per-alliance anchor.",
               "kr": "얼라이언스 센터 (5×5) + 3개 보조 건물 (돌·기름·마가타마 창고). 등대는 전쟁구역 공용."
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 11,
             "max_rings": 4,
@@ -653,7 +653,7 @@
               "en": "Marshall's Guard event platform (3×3, season-agnostic)",
               "kr": "마샬 가드 이벤트 플랫폼 (3×3, 모든 시즌 공통)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 0,
             "center_tiles": 3,
             "max_rings": 4,
@@ -673,7 +673,7 @@
               "en": "Bank Stronghold (S5 seasonal fortress — captured, holds CrystalGold deposits). Footprint speculative-by-analogy to S1 Military Stronghold.",
               "kr": "은행 요새 (S5 시즌 요새 — 크리스탈골드 예치. S1 군사 요새 대비 크기는 추정)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 21,
             "max_rings": 4,
@@ -819,7 +819,7 @@
               "en": "Marshall's Guard event platform (3×3, R4/R5-placed)",
               "kr": "마샬 가드 이벤트 플랫폼 (3×3, R4/R5 배치)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 0,
             "center_tiles": 3,
             "max_rings": 4,
@@ -839,7 +839,7 @@
               "en": "Military Stronghold (21×21 tile fortress surrounded by mud)",
               "kr": "군사 요새 (21×21, 진흙에 둘러싸인 요새)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 21,
             "max_rings": 4,
@@ -859,7 +859,7 @@
               "en": "Shared Alliance Assembly Point (R5-set flag). No environmental building anchors it — R5 chooses placement based on faction strategic zone.",
               "kr": "공유 얼라이언스 집결 지점 (R5 설정 깃발). 환경 앵커 건물 없음."
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 21,
             "max_rings": 8,
@@ -972,7 +972,7 @@
               "en": "Marshall's Guard 3×3 event platform (permanent cross-season object, presumed to persist)",
               "kr": "마샬 가드 3×3 이벤트 플랫폼 (상시 오브젝트, 유지 가정)"
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 0,
             "center_tiles": 3,
             "max_rings": 4,
@@ -993,7 +993,7 @@
               "en": "Season 7 central building (TBD — placeholder). S1→S6 pattern: each season ships a central shared building (Military Stronghold / Alliance Furnace / Blessing Fountain / Lighthouse / Bank Stronghold / Altars).",
               "kr": "시즌 7 중앙 건물 (미정 — 자리표시자). S1→S6 패턴상 시즌마다 중앙 공유 건물 등장."
             },
-            "member_size": 3,
+            "member_size": 2,
             "gap_tiles": 2,
             "center_tiles": 21,
             "max_rings": 4,

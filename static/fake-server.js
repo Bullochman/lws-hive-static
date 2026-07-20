@@ -18,7 +18,23 @@
     'HIVE-B820D1-CA0AA7',   // legacy paid customer key from source project's keys.json
   ]);
 
+  // Schema-version tag written into every persisted cfg. Bumped 2026-07-20 when
+  // the KB-canonical 2×2 HQ footprint replaced the buggy 3×3 assumption — every
+  // stronghold slot coordinate saved under v1 is off-grid under v2 and must be
+  // dropped so the auto-assign can re-place members on the corrected slot list.
+  const SCHEMA_VERSION = 2;
+
   // Layout presets — mirror LAYOUT_PRESETS in hive_server.py
+  //
+  // Canonical tile math per LWS_Knowledge_Base/kb/16-map-dimensions.md
+  // (2026-07-19, community-planner consensus verified against
+  // cpt-hedge.com/maps/planner + lastwarhiveplanner.com):
+  //   - Player HQ world-map footprint = 2×2 tiles (NOT 3×3 — that number
+  //     refers to the internal base-view sub-grid)
+  //   - Polar Storm hive gap = 2 tiles → pitch = 4 tiles (HQ 2 + gap 2)
+  //   - Marshal's Guard hive: pack tight, 0-tile gap → pitch = 2 tiles
+  //     (MG mode below uses a per-cell abstraction — grid.step encodes the
+  //     tight MG pitch since one planner cell = one HQ)
   const LAYOUT_PRESETS = {
     mg: {
       label: "Marshall's Guard",
@@ -32,7 +48,11 @@
       short: 'Stronghold',
       use_tile_coords: true,
       center_tiles: 21,
-      member_size: 3,
+      // 2×2 HQ footprint per KB-canonical map math (was 3 pre-2026-07-20).
+      // With pitch = member_size + gap_tiles = 4, a 21×21 furnace + 4 rings
+      // yields 144 slots (Ring 1=24, R2=32, R3=40, R4=48) inside a ~54×54
+      // tile footprint — comfortable for a full 100-member alliance.
+      member_size: 2,
       gap_tiles: 2,
       max_rings: 4,
       center_size: 7,
@@ -69,12 +89,19 @@
   const RANK_ORD = { R5: 0, R4: 1, R3: 2, R2: 3, R1: 4 };
 
   // ── Default config (mirrors hive_config.example.json) ────────────────────
+  // grid.step is the MG-mode pitch (tiles per planner cell). Set to 2 to
+  // match the KB-canonical 2×2 HQ footprint under a tight Marshal's Guard
+  // pack (0-tile gap). Community consensus for a defensive standard-warzone
+  // hive is 3-tile pitch (2 HQ + 1 gap); that variant lives on the
+  // formation dropdown and only affects the label — the underlying MG
+  // renderer still uses one cell per member.
   function defaultConfig() {
     return {
       alliance_name: '',
       unlocked: false,
+      schema: SCHEMA_VERSION,
       mg: { x: 486, y: 432 },
-      grid: { cols: 10, rows: 10, mg_col: 4, mg_row: 4, step: 3 },
+      grid: { cols: 10, rows: 10, mg_col: 4, mg_row: 4, step: 2 },
       members: {},
       assignments: {},
     };
@@ -89,6 +116,17 @@
         return ensureLayout(cfg);
       }
       const cfg = JSON.parse(raw);
+      // Schema migration: v1 saved stronghold assignments on the buggy 3×3
+      // (5-tile-pitch) grid. Under v2 those coordinates no longer land on
+      // valid slots, so purge them and force the grid.step down to the new
+      // 2-tile MG pitch. Members + metadata are preserved so the user can
+      // re-run ⚡ Auto-Assign after the reload.
+      if (!cfg.schema || cfg.schema < SCHEMA_VERSION) {
+        console.info('[fake-server] migrating hivegrid_state → schema v' + SCHEMA_VERSION + ' (KB-canonical 2×2 HQ footprint)');
+        cfg.schema = SCHEMA_VERSION;
+        cfg.assignments = {};                        // drop stale placements
+        if (cfg.grid) cfg.grid.step = 2;             // MG-mode pitch → 2 tiles
+      }
       const enforced = ensureLayout(cfg);
       // Evict orphan stronghold assignments (positions no longer valid)
       if (enforced.layout && enforced.layout.use_tile_coords) {
@@ -127,13 +165,16 @@
     for (const k of Object.keys(preset)) {
       cfg.layout[k] = preset[k];
     }
-    // Ensure grid + mg exist (defensive for stale localStorage)
-    if (!cfg.grid) cfg.grid = { cols: 10, rows: 10, mg_col: 4, mg_row: 4, step: 3 };
+    // Ensure grid + mg exist (defensive for stale localStorage). MG-mode
+    // grid.step defaults to 2 (matches the KB-canonical 2×2 HQ footprint —
+    // Marshal's Guard hive packs tight with no gap).
+    if (!cfg.grid) cfg.grid = { cols: 10, rows: 10, mg_col: 4, mg_row: 4, step: 2 };
     if (!cfg.mg) cfg.mg = { x: 486, y: 432 };
     if (!cfg.members) cfg.members = {};
     if (!cfg.assignments) cfg.assignments = {};
     if (typeof cfg.alliance_name !== 'string') cfg.alliance_name = '';
     if (typeof cfg.unlocked !== 'boolean') cfg.unlocked = false;
+    if (typeof cfg.schema !== 'number') cfg.schema = SCHEMA_VERSION;
     return cfg;
   }
 
@@ -145,7 +186,8 @@
       const h = (preset.center_size - 1) >> 1;
       return Math.abs(c - g.mg_col) <= h && Math.abs(r - g.mg_row) <= h;
     }
-    // Stronghold: 3×3 member footprint at (c,r) top-left overlaps [-half, +half] centre?
+    // Stronghold: member footprint at (c,r) top-left overlaps [-half, +half] centre?
+    // (Footprint is 2×2 tiles per KB — see LAYOUT_PRESETS.stronghold.)
     const half = (preset.center_tiles - 1) >> 1;
     const member = preset.member_size;
     return (
@@ -593,7 +635,8 @@
     cfg.grid.rows = newSize;
     cfg.grid.mg_col = Math.floor(newSize / 2);
     cfg.grid.mg_row = Math.floor(newSize / 2);
-    cfg.grid.step = 3;
+    // 2-tile pitch per KB-canonical 2×2 HQ footprint (was 3 pre-2026-07-20).
+    cfg.grid.step = 2;
     ensureLayout(cfg);
     let evicted = 0;
     if (prevMode !== mode) {
